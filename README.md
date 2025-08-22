@@ -27,3 +27,9 @@
 - チーム全体の戦力分析や戦略立案に活用
 
 ---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---

@@ -3,86 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Realtime Database 完全版</title>
-  <style>
-    body { font-family: sans-serif; margin: 20px; }
-    input { margin: 0 5px; }
-    button { margin-left: 5px; }
-    li { margin: 5px 0; }
-  </style>
+  <title>Firestore 接続確認</title>
 </head>
 <body>
-  <h1>ユーザー管理</h1>
-
-  <label for="name">名前:</label>
-  <input type="text" id="name" placeholder="例: Taro">
-  <label for="age">年齢:</label>
-  <input type="number" id="age" placeholder="例: 25">
-  <button id="saveBtn">追加</button>
-
-  <h2>ユーザー一覧</h2>
-  <ul id="userList"></ul>
+  <h1>Firestore 接続テスト</h1>
+  <button id="testBtn">接続チェック</button>
+  <pre id="output"></pre>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-    // Firebase 設定
+    // あなたの Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
       authDomain: "hudarogu-71a4f.firebaseapp.com",
-      databaseURL: "https://hudarogu-71a4f-default-rtdb.firebaseio.com",
       projectId: "hudarogu-71a4f",
       storageBucket: "hudarogu-71a4f.appspot.com",
       messagingSenderId: "453627568918",
       appId: "1:453627568918:web:85f634cfa2d0ca358e2637"
     };
 
+    // 初期化
     const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+    const db = getFirestore(app);
 
-    const nameInput = document.getElementById("name");
-    const ageInput = document.getElementById("age");
-    const saveBtn = document.getElementById("saveBtn");
-    const userList = document.getElementById("userList");
+    const testBtn = document.getElementById("testBtn");
+    const output = document.getElementById("output");
 
-    // データ追加
-    saveBtn.addEventListener("click", () => {
-      const name = nameInput.value.trim();
-      const age = parseInt(ageInput.value);
-
-      if (!name || isNaN(age)) {
-        alert("名前と年齢を正しく入力してください");
-        return;
+    // テストボタン → Firestoreにデータを書き込み
+    testBtn.addEventListener("click", async () => {
+      try {
+        await setDoc(doc(db, "testCollection", "testDoc"), {
+          message: "接続成功！",
+          timestamp: Date.now()
+        });
+        alert("Firestore にデータを保存しました！");
+      } catch (error) {
+        console.error("書き込みエラー:", error);
       }
-
-      set(ref(database, 'users/' + name), { name, age })
-        .then(() => {
-          nameInput.value = "";
-          ageInput.value = "";
-        })
-        .catch(error => console.error("書き込みエラー:", error));
     });
 
-    // データ取得 & 表示
-    const usersRef = ref(database, 'users');
-    onValue(usersRef, (snapshot) => {
-      const data = snapshot.val() || {};
-      userList.innerHTML = "";
-      for (const key in data) {
-        const li = document.createElement("li");
-        li.textContent = `${data[key].name} (${data[key].age}歳) `;
-        
-        // 削除ボタン
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "削除";
-        delBtn.addEventListener("click", () => {
-          remove(ref(database, 'users/' + key))
-            .catch(error => console.error("削除エラー:", error));
-        });
-
-        li.appendChild(delBtn);
-        userList.appendChild(li);
+    // Firestoreのリアルタイム監視
+    onSnapshot(doc(db, "testCollection", "testDoc"), (docSnap) => {
+      if (docSnap.exists()) {
+        output.textContent = JSON.stringify(docSnap.data(), null, 2);
+      } else {
+        output.textContent = "ドキュメントが存在しません";
       }
     });
   </script>

@@ -3,16 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Database 接続テスト</title>
+  <title>Firebase Realtime Database 完全版</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    input { margin: 0 5px; }
+    button { margin-left: 5px; }
+    li { margin: 5px 0; }
+  </style>
 </head>
 <body>
-  <h1>Firebase Database 接続テスト</h1>
-  <button id="testBtn">テストデータを保存</button>
-  <pre id="output"></pre>
+  <h1>ユーザー管理</h1>
+
+  <label for="name">名前:</label>
+  <input type="text" id="name" placeholder="例: Taro">
+  <label for="age">年齢:</label>
+  <input type="number" id="age" placeholder="例: 25">
+  <button id="saveBtn">追加</button>
+
+  <h2>ユーザー一覧</h2>
+  <ul id="userList"></ul>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
 
     // Firebase 設定
     const firebaseConfig = {
@@ -25,34 +38,51 @@
       appId: "1:453627568918:web:85f634cfa2d0ca358e2637"
     };
 
-    // Firebase 初期化
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
 
-    const testBtn = document.getElementById("testBtn");
-    const output = document.getElementById("output");
+    const nameInput = document.getElementById("name");
+    const ageInput = document.getElementById("age");
+    const saveBtn = document.getElementById("saveBtn");
+    const userList = document.getElementById("userList");
 
-    // ボタン押下でテストデータを書き込む
-    testBtn.addEventListener("click", () => {
-      set(ref(database, 'testConnection'), {
-        message: "接続成功！",
-        timestamp: Date.now()
-      })
-      .then(() => {
-        output.textContent = "データを書き込みました！";
-      })
-      .catch((error) => {
-        output.textContent = "書き込みエラー: " + error;
-        console.error(error);
-      });
+    // データ追加
+    saveBtn.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      const age = parseInt(ageInput.value);
+
+      if (!name || isNaN(age)) {
+        alert("名前と年齢を正しく入力してください");
+        return;
+      }
+
+      set(ref(database, 'users/' + name), { name, age })
+        .then(() => {
+          nameInput.value = "";
+          ageInput.value = "";
+        })
+        .catch(error => console.error("書き込みエラー:", error));
     });
 
-    // データベースの内容をリアルタイム取得
-    const testRef = ref(database, 'testConnection');
-    onValue(testRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        output.textContent = JSON.stringify(data, null, 2);
+    // データ取得 & 表示
+    const usersRef = ref(database, 'users');
+    onValue(usersRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      userList.innerHTML = "";
+      for (const key in data) {
+        const li = document.createElement("li");
+        li.textContent = `${data[key].name} (${data[key].age}歳) `;
+        
+        // 削除ボタン
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "削除";
+        delBtn.addEventListener("click", () => {
+          remove(ref(database, 'users/' + key))
+            .catch(error => console.error("削除エラー:", error));
+        });
+
+        li.appendChild(delBtn);
+        userList.appendChild(li);
       }
     });
   </script>

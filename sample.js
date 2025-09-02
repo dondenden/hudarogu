@@ -1,20 +1,16 @@
-// Firebase SDK のインポート
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Firebase の設定（自分の設定を貼り付ける）
+// Firebase の設定
 const firebaseConfig = {
-    apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
-    authDomain: "hudarogu-71a4f.firebaseapp.com",
-    projectId: "hudarogu-71a4f",
-    storageBucket: "hudarogu-71a4f.firebasestorage.app",
-    messagingSenderId: "453627568918",
-    appId: "1:453627568918:web:85f634cfa2d0ca358e2637",
-    measurementId: "G-EVDBZ70E5C"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-
-// Firebase 初期化
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -22,7 +18,6 @@ const db = getFirestore(app);
 const form = document.getElementById("nameForm");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const name = document.getElementById("name").value;
 
   try {
@@ -30,9 +25,8 @@ form.addEventListener("submit", async (e) => {
       name: name,
       createdAt: new Date()
     });
-    alert("名前を保存しました！");
     form.reset();
-    loadNames(); // 保存後に一覧を更新
+    loadNames();
   } catch (error) {
     console.error("Error adding document: ", error);
   }
@@ -44,10 +38,22 @@ async function loadNames() {
   nameList.innerHTML = "";
 
   const querySnapshot = await getDocs(collection(db, "players"));
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
     const li = document.createElement("li");
-    li.textContent = data.name;
+    li.textContent = data.name + " ";
+
+    // 削除ボタン
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "削除";
+    delBtn.addEventListener("click", async () => {
+      if (confirm(`${data.name} を削除しますか？`)) {
+        await deleteDoc(doc(db, "players", docSnap.id));
+        loadNames();
+      }
+    });
+
+    li.appendChild(delBtn);
     nameList.appendChild(li);
   });
 }

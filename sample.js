@@ -3,12 +3,13 @@ import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https
 
 // Firebase の設定
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
+    authDomain: "hudarogu-71a4f.firebaseapp.com",
+    projectId: "hudarogu-71a4f",
+    storageBucket: "hudarogu-71a4f.firebasestorage.app",
+    messagingSenderId: "453627568918",
+    appId: "1:453627568918:web:85f634cfa2d0ca358e2637",
+    measurementId: "G-EVDBZ70E5C"
 };
 
 const app = initializeApp(firebaseConfig);

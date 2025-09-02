@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>生徒側メイン</title>
+</head>
+<body>
+  <h1>生徒側メイン</h1>
+
+  <!-- ログインUI -->
+  <button id="loginBtn">Googleでログイン</button>
+  <button id="logoutBtn" style="display:none;">ログアウト</button>
+  <p id="userInfo">ログインしていません</p>
+
+  <!-- 学校名入力 -->
+  <input type="text" id="school_name" placeholder="学校名を入力" disabled />
+
+  <!-- 学校ID入力（学校名が正しい場合のみ表示） -->
+  <div id="schoolIdContainer" style="display:none; margin-top: 10px;">
+    <input type="text" id="school_id" placeholder="学校IDを入力" />
+    <button id="confirmBtn">参加する</button>
+  </div>
+
+  <script type="module" src="js/student_index.js?v=202508132211"></script>
+</body>
+</html>

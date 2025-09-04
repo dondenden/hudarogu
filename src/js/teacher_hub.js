@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getFirestore,
-  collection,
   doc,
   getDoc,
   setDoc,
@@ -22,10 +21,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// HTML参照
 const form = document.getElementById("schoolForm");
 const schoolNameInput = document.getElementById("schoolName");
 const passwordWrapper = document.getElementById("passwordWrapper");
 const passwordLabel = document.getElementById("passwordLabel");
+const backButton = document.getElementById("backButton");
 
 // 学校名入力後にパスワード欄表示
 schoolNameInput.addEventListener("blur", async () => {
@@ -35,15 +36,18 @@ schoolNameInput.addEventListener("blur", async () => {
   const passwordDocRef = doc(db, schoolName, "passwordDoc");
   const passwordSnap = await getDoc(passwordDocRef);
 
+  // パスワード欄を表示
   passwordWrapper.style.display = "block";
 
   if (!passwordSnap.exists()) {
+    // 新規登録用
     passwordLabel.innerHTML = `
       パスワード作成:
       <input type="password" id="schoolPassword" required>
       <button type="button" id="togglePassword">👁️</button>
     `;
   } else {
+    // 既存学校用
     passwordLabel.innerHTML = `
       パスワード入力:
       <input type="password" id="schoolPassword" required>
@@ -51,7 +55,7 @@ schoolNameInput.addEventListener("blur", async () => {
     `;
   }
 
-  // パスワード表示切替
+  // パスワード表示/非表示切替
   const toggleBtn = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("schoolPassword");
   toggleBtn.addEventListener("click", () => {
@@ -99,5 +103,9 @@ form.addEventListener("submit", async (e) => {
     console.error("Error: ", error);
     alert("エラーが発生しました。");
   }
-  window.location.href = 'https://dondenden.github.io/hudarogu/src/index';
+});
+
+// 戻るボタン処理
+backButton.addEventListener("click", () => {
+  window.location.href = 'https://dondenden.github.io/hudarogu/src/index';// トップページに戻る
 });

@@ -123,7 +123,10 @@ deleteForm.addEventListener("submit", async (e) => {
   deleteForm.reset();
 });
 
-window.location.href = 'https://dondenden.github.io/hudarogu/src/index';
+// 戻るボタン処理
+backButton.addEventListener("click", () => {
+  window.location.href = 'https://dondenden.github.io/hudarogu/src/index';// トップページに戻る
+});
 
 // 初回表示
 loadNames();

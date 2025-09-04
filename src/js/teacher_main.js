@@ -123,5 +123,7 @@ deleteForm.addEventListener("submit", async (e) => {
   deleteForm.reset();
 });
 
+window.location.href = 'https://dondenden.github.io/hudarogu/src/index';
+
 // 初回表示
 loadNames();

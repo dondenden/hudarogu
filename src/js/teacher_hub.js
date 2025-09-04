@@ -99,4 +99,5 @@ form.addEventListener("submit", async (e) => {
     console.error("Error: ", error);
     alert("エラーが発生しました。");
   }
+  window.location.href = 'https://dondenden.github.io/hudarogu/src/index';
 });

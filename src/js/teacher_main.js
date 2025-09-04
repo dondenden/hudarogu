@@ -6,7 +6,7 @@ import {
   getDocs,
   deleteDoc,
   doc,
-  serverTimestamp,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Firebase の設定
@@ -27,7 +27,7 @@ const db = getFirestore(app);
 const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 
-// ✅ 名前一覧を表示する関数
+// 🔹 名前一覧を表示する関数
 async function loadNames() {
   list.innerHTML = "";
 
@@ -53,7 +53,7 @@ async function loadNames() {
   });
 }
 
-// フォーム処理
+// 🔹 名前登録フォーム
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = document.getElementById("name").value.trim();
@@ -65,11 +65,45 @@ form.addEventListener("submit", async (e) => {
       createdAt: serverTimestamp(),
     });
     form.reset();
-    await loadNames(); // ← ここで定義済みの loadNames が呼べる
+    await loadNames();
   } catch (error) {
     console.error("Error adding document: ", error);
   }
 });
 
-// ページ初期表示時に一覧を読み込み
+// 初回表示時に名前一覧読み込み
 loadNames();
+
+// 🔹 学校コレクション削除フォーム
+const deleteForm = document.getElementById("deleteForm");
+
+async function deleteCollection(schoolName) {
+  const colRef = collection(db, schoolName);
+  const snap = await getDocs(colRef);
+
+  if (snap.empty) {
+    alert(`学校「${schoolName}」は存在しません。`);
+    return;
+  }
+
+  if (!confirm(`本当に学校「${schoolName}」を削除しますか？\nこの操作は元に戻せません。`)) return;
+
+  try {
+    for (const docSnap of snap.docs) {
+      await deleteDoc(doc(db, schoolName, docSnap.id));
+    }
+    alert(`学校「${schoolName}」を削除しました。`);
+  } catch (error) {
+    console.error("Error deleting collection: ", error);
+    alert("削除中にエラーが発生しました。");
+  }
+}
+
+deleteForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const schoolName = document.getElementById("deleteSchoolName").value.trim();
+  if (!schoolName) return;
+
+  await deleteCollection(schoolName);
+  deleteForm.reset();
+});

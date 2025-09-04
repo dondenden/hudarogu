@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>カルタ練習記録（名前のみ）</title>
-  <script type="module" src="js/teacher_main.js?v=202509041224"></script>
+  <script type="module" src="js/teacher_main.js?v=202509050133"></script>
 </head>
 <body>
   <h1>カルタ練習記録</h1>
 
+  <!-- 名前登録フォーム -->
   <form id="nameForm">
     <label>名前: <input type="text" id="name" required></label>
     <button type="submit">保存</button>
@@ -15,5 +16,12 @@
 
   <h2>登録された名前一覧</h2>
   <ul id="nameList"></ul>
+
+  <!-- 学校コレクション削除フォーム -->
+  <h2>学校コレクション削除（注意）</h2>
+  <form id="deleteForm">
+    <label>削除する学校名: <input type="text" id="deleteSchoolName" required></label>
+    <button type="submit">削除</button>
+  </form>
 </body>
 </html>

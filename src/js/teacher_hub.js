@@ -2,9 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import {
   getFirestore,
   collection,
-  getDocs,
-  addDoc,
-  serverTimestamp,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Firebase 設定
@@ -26,25 +27,23 @@ const schoolNameInput = document.getElementById("schoolName");
 const passwordWrapper = document.getElementById("passwordWrapper");
 const passwordLabel = document.getElementById("passwordLabel");
 
-// 🔹 学校名が入力されたら存在チェック
+// 学校名入力後にパスワード欄表示
 schoolNameInput.addEventListener("blur", async () => {
   const schoolName = schoolNameInput.value.trim();
   if (!schoolName) return;
 
-  const snap = await getDocs(collection(db, schoolName));
+  const passwordDocRef = doc(db, schoolName, "passwordDoc");
+  const passwordSnap = await getDoc(passwordDocRef);
 
-  // パスワード欄を表示
   passwordWrapper.style.display = "block";
 
-  if (snap.empty) {
-    // 新規学校 → パスワード作成
+  if (!passwordSnap.exists()) {
     passwordLabel.innerHTML = `
       パスワード作成:
       <input type="password" id="schoolPassword" required>
       <button type="button" id="togglePassword">👁️</button>
     `;
   } else {
-    // 既存学校 → パスワード入力
     passwordLabel.innerHTML = `
       パスワード入力:
       <input type="password" id="schoolPassword" required>
@@ -52,7 +51,7 @@ schoolNameInput.addEventListener("blur", async () => {
     `;
   }
 
-  // 🔹 パスワード表示/非表示切替
+  // パスワード表示切替
   const toggleBtn = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("schoolPassword");
   toggleBtn.addEventListener("click", () => {
@@ -66,7 +65,7 @@ schoolNameInput.addEventListener("blur", async () => {
   });
 });
 
-// 🔹 フォーム送信処理
+// フォーム送信処理
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -75,35 +74,27 @@ form.addEventListener("submit", async (e) => {
   if (!schoolName || !schoolPassword) return;
 
   try {
-    const schoolCol = collection(db, schoolName);
-    const snap = await getDocs(schoolCol);
+    const passwordDocRef = doc(db, schoolName, "passwordDoc");
+    const passwordSnap = await getDoc(passwordDocRef);
 
-    if (snap.empty) {
+    if (!passwordSnap.exists()) {
       // 新規登録
-      await addDoc(schoolCol, {
+      await setDoc(passwordDocRef, {
         password: schoolPassword,
-        createdAt: serverTimestamp(),
+        createdAt: serverTimestamp()
       });
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
       // パスワードチェック
-      let isValid = false;
-      snap.forEach((docSnap) => {
-        const data = docSnap.data();
-        if (data.password === schoolPassword) {
-          isValid = true;
-        }
-      });
-
-      if (isValid) {
-        alert(`学校「${schoolName}」にログインしました！`);
-      } else {
+      const data = passwordSnap.data();
+      if (data.password !== schoolPassword) {
         alert("パスワードが間違っています。");
+        return;
       }
     }
 
-    form.reset();
-    passwordWrapper.style.display = "none"; // 送信後は再び非表示に戻す
+    // 成功したら名前登録画面へ遷移
+    window.location.href = `https://dondenden.github.io/hudarogu/src/teacher_main.html?school=${encodeURIComponent(schoolName)}`;
   } catch (error) {
     console.error("Error: ", error);
     alert("エラーが発生しました。");

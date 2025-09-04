@@ -7,7 +7,7 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// ✅ Firebase の設定
+// Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -38,11 +38,32 @@ schoolNameInput.addEventListener("blur", async () => {
 
   if (snap.empty) {
     // 新規学校 → パスワード作成
-    passwordLabel.innerHTML = 'パスワード作成: <input type="password" id="schoolPassword" required>';
+    passwordLabel.innerHTML = `
+      パスワード作成:
+      <input type="password" id="schoolPassword" required>
+      <button type="button" id="togglePassword">👁️</button>
+    `;
   } else {
     // 既存学校 → パスワード入力
-    passwordLabel.innerHTML = 'パスワード入力: <input type="password" id="schoolPassword" required>';
+    passwordLabel.innerHTML = `
+      パスワード入力:
+      <input type="password" id="schoolPassword" required>
+      <button type="button" id="togglePassword">👁️</button>
+    `;
   }
+
+  // 🔹 パスワード表示/非表示切替
+  const toggleBtn = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("schoolPassword");
+  toggleBtn.addEventListener("click", () => {
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      toggleBtn.textContent = "🙈";
+    } else {
+      passwordInput.type = "password";
+      toggleBtn.textContent = "👁️";
+    }
+  });
 });
 
 // 🔹 フォーム送信処理
@@ -50,7 +71,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const schoolName = schoolNameInput.value.trim();
-  const schoolPassword = document.getElementById("schoolPassword").value.trim();
+  const schoolPassword = document.getElementById("schoolPassword")?.value.trim();
   if (!schoolName || !schoolPassword) return;
 
   try {

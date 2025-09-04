@@ -23,7 +23,7 @@ const db = getFirestore(app);
 
 const form = document.getElementById("schoolForm");
 const schoolNameInput = document.getElementById("schoolName");
-const passwordInput = document.getElementById("schoolPassword");
+const passwordWrapper = document.getElementById("passwordWrapper");
 const passwordLabel = document.getElementById("passwordLabel");
 
 // 🔹 学校名が入力されたら存在チェック
@@ -32,6 +32,10 @@ schoolNameInput.addEventListener("blur", async () => {
   if (!schoolName) return;
 
   const snap = await getDocs(collection(db, schoolName));
+
+  // パスワード欄を表示
+  passwordWrapper.style.display = "block";
+
   if (snap.empty) {
     // 新規学校
     passwordLabel.innerHTML = 'パスワード作成: <input type="password" id="schoolPassword" required>';
@@ -78,7 +82,7 @@ form.addEventListener("submit", async (e) => {
     }
 
     form.reset();
-    passwordLabel.innerHTML = 'パスワード: <input type="password" id="schoolPassword" required>';
+    passwordWrapper.style.display = "none"; // 送信後は再び非表示に戻す
   } catch (error) {
     console.error("Error: ", error);
     alert("エラーが発生しました。");

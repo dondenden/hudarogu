@@ -9,7 +9,6 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -23,7 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// URLパラメータから学校名を取得
+// URLパラメータから学校名取得
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 if (!schoolName) {
@@ -31,23 +30,35 @@ if (!schoolName) {
   throw new Error("学校名が未指定です");
 }
 
-// HTML要素参照
+// HTML参照
 const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
+const deleteForm = document.getElementById("deleteForm");
 
-// 🔹 学校ごとの名前一覧を表示
+// 🔹 名前一覧表示
 async function loadNames() {
   list.innerHTML = "";
+
   const snap = await getDocs(collection(db, schoolName));
+
+  if (snap.empty) {
+    const li = document.createElement("li");
+    li.textContent = "まだ名前は登録されていません";
+    list.appendChild(li);
+    return;
+  }
+
   snap.forEach((docSnap) => {
     const data = docSnap.data();
+    const name = data.name || "（名前不明）"; // undefined対策
+
     const li = document.createElement("li");
-    li.textContent = `${data.name} `;
+    li.textContent = `${name} `;
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "削除";
     delBtn.addEventListener("click", async () => {
-      if (confirm(`${data.name} を削除しますか？`)) {
+      if (confirm(`${name} を削除しますか？`)) {
         await deleteDoc(doc(db, schoolName, docSnap.id));
         await loadNames();
       }
@@ -58,10 +69,11 @@ async function loadNames() {
   });
 }
 
-// 🔹 名前登録フォーム
+// 🔹 名前登録
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("name").value.trim();
+  const nameInput = document.getElementById("name");
+  const name = nameInput.value.trim();
   if (!name) return;
 
   try {
@@ -69,19 +81,14 @@ form.addEventListener("submit", async (e) => {
       name: name,
       createdAt: serverTimestamp(),
     });
-    form.reset();
+    nameInput.value = "";
     await loadNames();
   } catch (error) {
     console.error("Error adding document: ", error);
   }
 });
 
-// 初回表示時に名前一覧読み込み
-loadNames();
-
-// 🔹 学校コレクション削除フォーム
-const deleteForm = document.getElementById("deleteForm");
-
+// 🔹 学校コレクション削除
 async function deleteCollection(targetSchool) {
   const colRef = collection(db, targetSchool);
   const snap = await getDocs(colRef);
@@ -112,3 +119,6 @@ deleteForm.addEventListener("submit", async (e) => {
   await deleteCollection(targetSchool);
   deleteForm.reset();
 });
+
+// 初回表示
+loadNames();

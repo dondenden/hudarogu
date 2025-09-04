@@ -2,8 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import {
   getFirestore,
   collection,
-  query,
-  where,
   getDocs,
   addDoc,
   serverTimestamp,
@@ -33,20 +31,21 @@ form.addEventListener("submit", async (e) => {
   if (!schoolName || !schoolPassword) return;
 
   try {
-    // 🔍 学校名で検索
-    const q = query(collection(db, "schools"), where("schoolName", "==", schoolName));
-    const snap = await getDocs(q);
+    // 🔍 学校名をコレクション名として使用
+    const schoolCol = collection(db, schoolName);
+
+    // 既存パスワード確認（= そのコレクションに "password" ドキュメントがあるか確認）
+    const snap = await getDocs(schoolCol);
 
     if (snap.empty) {
-      // 学校が存在しなければ新規登録
-      await addDoc(collection(db, "schools"), {
-        schoolName: schoolName,
+      // 学校コレクションが存在しない → 新規登録
+      await addDoc(schoolCol, {
         password: schoolPassword,
         createdAt: serverTimestamp(),
       });
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
-      // 既存 → パスワード確認
+      // 既存コレクション → パスワード一致確認
       let isValid = false;
       snap.forEach((docSnap) => {
         const data = docSnap.data();
@@ -57,7 +56,6 @@ form.addEventListener("submit", async (e) => {
 
       if (isValid) {
         alert(`学校「${schoolName}」にログインしました！`);
-        // ✅ この後、遷移や別処理を追加してOK
       } else {
         alert("パスワードが間違っています。");
       }

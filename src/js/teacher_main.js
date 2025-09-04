@@ -9,7 +9,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Firebase の設定
+// Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -23,27 +23,32 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// URLパラメータから学校名を取得
+const params = new URLSearchParams(window.location.search);
+const schoolName = params.get("school");
+if (!schoolName) {
+  alert("学校名が指定されていません。URLに ?school=学校名 を付けてアクセスしてください。");
+  throw new Error("学校名が未指定です");
+}
+
 // HTML要素参照
 const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 
-// 🔹 名前一覧を表示する関数
+// 🔹 学校ごとの名前一覧を表示
 async function loadNames() {
   list.innerHTML = "";
-
-  const snap = await getDocs(collection(db, "players"));
+  const snap = await getDocs(collection(db, schoolName));
   snap.forEach((docSnap) => {
     const data = docSnap.data();
-
     const li = document.createElement("li");
     li.textContent = `${data.name} `;
 
-    // 削除ボタン
     const delBtn = document.createElement("button");
     delBtn.textContent = "削除";
     delBtn.addEventListener("click", async () => {
       if (confirm(`${data.name} を削除しますか？`)) {
-        await deleteDoc(doc(db, "players", docSnap.id));
+        await deleteDoc(doc(db, schoolName, docSnap.id));
         await loadNames();
       }
     });
@@ -60,7 +65,7 @@ form.addEventListener("submit", async (e) => {
   if (!name) return;
 
   try {
-    await addDoc(collection(db, "players"), {
+    await addDoc(collection(db, schoolName), {
       name: name,
       createdAt: serverTimestamp(),
     });
@@ -77,22 +82,22 @@ loadNames();
 // 🔹 学校コレクション削除フォーム
 const deleteForm = document.getElementById("deleteForm");
 
-async function deleteCollection(schoolName) {
-  const colRef = collection(db, schoolName);
+async function deleteCollection(targetSchool) {
+  const colRef = collection(db, targetSchool);
   const snap = await getDocs(colRef);
 
   if (snap.empty) {
-    alert(`学校「${schoolName}」は存在しません。`);
+    alert(`学校「${targetSchool}」は存在しません。`);
     return;
   }
 
-  if (!confirm(`本当に学校「${schoolName}」を削除しますか？\nこの操作は元に戻せません。`)) return;
+  if (!confirm(`本当に学校「${targetSchool}」を削除しますか？\nこの操作は元に戻せません。`)) return;
 
   try {
     for (const docSnap of snap.docs) {
-      await deleteDoc(doc(db, schoolName, docSnap.id));
+      await deleteDoc(doc(db, targetSchool, docSnap.id));
     }
-    alert(`学校「${schoolName}」を削除しました。`);
+    alert(`学校「${targetSchool}」を削除しました。`);
   } catch (error) {
     console.error("Error deleting collection: ", error);
     alert("削除中にエラーが発生しました。");
@@ -101,9 +106,9 @@ async function deleteCollection(schoolName) {
 
 deleteForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const schoolName = document.getElementById("deleteSchoolName").value.trim();
-  if (!schoolName) return;
+  const targetSchool = document.getElementById("deleteSchoolName").value.trim();
+  if (!targetSchool) return;
 
-  await deleteCollection(schoolName);
+  await deleteCollection(targetSchool);
   deleteForm.reset();
 });

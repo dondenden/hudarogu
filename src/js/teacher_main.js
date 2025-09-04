@@ -9,7 +9,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// 🔹 Firebase 設定（必ずご自身のプロジェクト情報に置き換えてください）
+// 🔹 Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -56,7 +56,7 @@ async function loadNames() {
     const li = document.createElement("li");
     li.textContent = `${name} `;
 
-    // 🔹 削除ボタン
+    // 🔹 名前削除ボタン
     const delBtn = document.createElement("button");
     delBtn.textContent = "削除";
     delBtn.addEventListener("click", async () => {
@@ -81,7 +81,7 @@ form.addEventListener("submit", async (e) => {
   try {
     await addDoc(collection(db, schoolName), {
       name: name,
-      type: "name",           // 名前ドキュメントの目印
+      type: "name",
       createdAt: serverTimestamp()
     });
     nameInput.value = "";

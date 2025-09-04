@@ -2,12 +2,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import {
   getFirestore,
   collection,
-  addDoc,
+  query,
+  where,
   getDocs,
+  addDoc,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// ✅ Firebase の設定（teacher_main.js と同じものを反映）
+// ✅ Firebase の設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -21,40 +23,49 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// HTML要素参照
 const form = document.getElementById("schoolForm");
-const list = document.getElementById("recordList");
 
-// 🔹 学校名ごとの記録を表示する関数
-async function loadRecords(schoolName) {
-  list.innerHTML = "";
-
-  const snap = await getDocs(collection(db, schoolName));
-  snap.forEach((docSnap) => {
-    const data = docSnap.data();
-    const li = document.createElement("li");
-    li.textContent = data.name;
-    list.appendChild(li);
-  });
-}
-
-// フォーム処理
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const schoolName = document.getElementById("schoolName").value.trim();
-  const studentName = document.getElementById("studentName").value.trim();
-  if (!schoolName || !studentName) return;
+  const schoolPassword = document.getElementById("schoolPassword").value.trim();
+  if (!schoolName || !schoolPassword) return;
 
   try {
-    // ✅ 入力された学校名をコレクション名として使用
-    await addDoc(collection(db, schoolName), {
-      name: studentName,
-      createdAt: serverTimestamp(),
-    });
+    // 🔍 学校名で検索
+    const q = query(collection(db, "schools"), where("schoolName", "==", schoolName));
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      // 学校が存在しなければ新規登録
+      await addDoc(collection(db, "schools"), {
+        schoolName: schoolName,
+        password: schoolPassword,
+        createdAt: serverTimestamp(),
+      });
+      alert(`学校「${schoolName}」を新規登録しました！`);
+    } else {
+      // 既存 → パスワード確認
+      let isValid = false;
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.password === schoolPassword) {
+          isValid = true;
+        }
+      });
+
+      if (isValid) {
+        alert(`学校「${schoolName}」にログインしました！`);
+        // ✅ この後、遷移や別処理を追加してOK
+      } else {
+        alert("パスワードが間違っています。");
+      }
+    }
+
     form.reset();
-    await loadRecords(schoolName);
   } catch (error) {
-    console.error("Error adding document: ", error);
+    console.error("Error: ", error);
+    alert("エラーが発生しました。");
   }
 });

@@ -2,19 +2,15 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>学校名入力</title>
-  <script type="module" src="js/teacher_hub.js"></script>
+  <title>学校ログイン/登録</title>
+  <script type="module" src="js/teacher_sub.js?v=202509050014"></script>
 </head>
 <body>
-  <h1>学校ごとの記録</h1>
-
+  <h1>学校ログイン / 新規登録</h1>
   <form id="schoolForm">
     <label>学校名: <input type="text" id="schoolName" required></label><br>
-    <label>名前: <input type="text" id="studentName" required></label><br>
-    <button type="submit">保存</button>
+    <label>パスワード: <input type="password" id="schoolPassword" required></label><br>
+    <button type="submit">送信</button>
   </form>
-
-  <h2>記録一覧</h2>
-  <ul id="recordList"></ul>
 </body>
 </html>

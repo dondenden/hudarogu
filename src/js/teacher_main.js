@@ -77,6 +77,12 @@ form.addEventListener("submit", async (e) => {
   const nameInput = document.getElementById("name");
   const name = nameInput.value.trim();
   if (!name) return;
+  
+  const invalidChars = /[\/#?\[\]]/;
+  if (invalidChars.test(name)) {
+    alert("名前に使えない文字が含まれています。\n使用できない文字: / # ? [ ]");
+    return; // 登録中止
+  }
 
   try {
     await addDoc(collection(db, schoolName), {

@@ -37,10 +37,10 @@ schoolNameInput.addEventListener("blur", async () => {
   passwordWrapper.style.display = "block";
 
   if (snap.empty) {
-    // 新規学校
+    // 新規学校 → パスワード作成
     passwordLabel.innerHTML = 'パスワード作成: <input type="password" id="schoolPassword" required>';
   } else {
-    // 既存学校
+    // 既存学校 → パスワード入力
     passwordLabel.innerHTML = 'パスワード入力: <input type="password" id="schoolPassword" required>';
   }
 });

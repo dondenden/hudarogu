@@ -22,30 +22,46 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const form = document.getElementById("schoolForm");
+const schoolNameInput = document.getElementById("schoolName");
+const passwordInput = document.getElementById("schoolPassword");
+const passwordLabel = document.getElementById("passwordLabel");
 
+// 🔹 学校名が入力されたら存在チェック
+schoolNameInput.addEventListener("blur", async () => {
+  const schoolName = schoolNameInput.value.trim();
+  if (!schoolName) return;
+
+  const snap = await getDocs(collection(db, schoolName));
+  if (snap.empty) {
+    // 新規学校
+    passwordLabel.innerHTML = 'パスワード作成: <input type="password" id="schoolPassword" required>';
+  } else {
+    // 既存学校
+    passwordLabel.innerHTML = 'パスワード入力: <input type="password" id="schoolPassword" required>';
+  }
+});
+
+// 🔹 フォーム送信処理
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const schoolName = document.getElementById("schoolName").value.trim();
+  const schoolName = schoolNameInput.value.trim();
   const schoolPassword = document.getElementById("schoolPassword").value.trim();
   if (!schoolName || !schoolPassword) return;
 
   try {
-    // 🔍 学校名をコレクション名として使用
     const schoolCol = collection(db, schoolName);
-
-    // 既存パスワード確認（= そのコレクションに "password" ドキュメントがあるか確認）
     const snap = await getDocs(schoolCol);
 
     if (snap.empty) {
-      // 学校コレクションが存在しない → 新規登録
+      // 新規登録
       await addDoc(schoolCol, {
         password: schoolPassword,
         createdAt: serverTimestamp(),
       });
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
-      // 既存コレクション → パスワード一致確認
+      // パスワードチェック
       let isValid = false;
       snap.forEach((docSnap) => {
         const data = docSnap.data();
@@ -62,6 +78,7 @@ form.addEventListener("submit", async (e) => {
     }
 
     form.reset();
+    passwordLabel.innerHTML = 'パスワード: <input type="password" id="schoolPassword" required>';
   } catch (error) {
     console.error("Error: ", error);
     alert("エラーが発生しました。");

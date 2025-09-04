@@ -9,6 +9,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+// Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -22,7 +23,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// URLパラメータから学校名取得
+// URLパラメータから学校名を取得
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 if (!schoolName) {
@@ -35,22 +36,23 @@ const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const deleteForm = document.getElementById("deleteForm");
 
-// 🔹 名前一覧表示
+// 🔹 名前一覧表示（type === "name" のみ）
 async function loadNames() {
   list.innerHTML = "";
 
   const snap = await getDocs(collection(db, schoolName));
+  const nameDocs = snap.docs.filter(docSnap => docSnap.data().type === "name");
 
-  if (snap.empty) {
+  if (nameDocs.length === 0) {
     const li = document.createElement("li");
     li.textContent = "まだ名前は登録されていません";
     list.appendChild(li);
     return;
   }
 
-  snap.forEach((docSnap) => {
+  nameDocs.forEach((docSnap) => {
     const data = docSnap.data();
-    const name = data.name || "（名前不明）"; // undefined対策
+    const name = data.name || "（名前不明）";
 
     const li = document.createElement("li");
     li.textContent = `${name} `;
@@ -69,7 +71,7 @@ async function loadNames() {
   });
 }
 
-// 🔹 名前登録
+// 🔹 名前登録フォーム
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const nameInput = document.getElementById("name");
@@ -79,6 +81,7 @@ form.addEventListener("submit", async (e) => {
   try {
     await addDoc(collection(db, schoolName), {
       name: name,
+      type: "name",           // ← 名前用ドキュメントの目印
       createdAt: serverTimestamp(),
     });
     nameInput.value = "";
@@ -88,7 +91,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// 🔹 学校コレクション削除
+// 🔹 学校コレクション削除フォーム
 async function deleteCollection(targetSchool) {
   const colRef = collection(db, targetSchool);
   const snap = await getDocs(colRef);

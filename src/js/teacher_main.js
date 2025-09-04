@@ -10,7 +10,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Firebase 設定
-const firebaseConfig = { ... }; // 省略
+const firebaseConfig = {}; // 省略
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -77,9 +77,9 @@ form.addEventListener("submit", async (e) => {
 });
 
 // 学校コレクション削除
-async function deleteCollection(targetSchool) { ... } // 既存のまま
+async function deleteCollection(targetSchool) {} // 既存のまま
 
-deleteForm.addEventListener("submit", async (e) => { ... }); // 既存のまま
+deleteForm.addEventListener("submit", async (e) => {}); // 既存のまま
 
 // 戻るボタン処理
 backButton.addEventListener("click", () => {

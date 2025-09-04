@@ -27,8 +27,8 @@ const db = getFirestore(app);
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 if (!schoolName) {
-  alert("学校名が指定されていません。URLに ?school=学校名 を付けてアクセスしてください。");
-  throw new Error("学校名が未指定です");
+  alert("学校名が指定されていません。ログインし直してください");
+  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
 }
 
 // 🔹 HTML参照

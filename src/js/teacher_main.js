@@ -2,10 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import {
   getFirestore,
   collection,
-  addDoc,
   getDocs,
   deleteDoc,
   doc,
+  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -40,18 +40,17 @@ const backButton = document.getElementById("backButton");
 async function loadNames() {
   list.innerHTML = "";
   const snap = await getDocs(collection(db, schoolName));
-  const nameDocs = snap.docs.filter(docSnap => docSnap.data().type === "name");
 
-  if (nameDocs.length === 0) {
+  if (snap.empty) {
     const li = document.createElement("li");
     li.textContent = "まだ名前は登録されていません";
     list.appendChild(li);
     return;
   }
 
-  nameDocs.forEach(docSnap => {
+  snap.forEach(docSnap => {
     const data = docSnap.data();
-    const name = data.name || "（名前不明）";
+    const name = docSnap.id; // ← ドキュメントIDをそのまま名前として使う
 
     const li = document.createElement("li");
     li.textContent = `${name} `;
@@ -61,7 +60,7 @@ async function loadNames() {
     delBtn.textContent = "削除";
     delBtn.addEventListener("click", async () => {
       if (confirm(`${name} を削除しますか？`)) {
-        await deleteDoc(doc(db, schoolName, docSnap.id));
+        await deleteDoc(doc(db, schoolName, name));
         await loadNames();
       }
     });
@@ -77,7 +76,7 @@ form.addEventListener("submit", async (e) => {
   const nameInput = document.getElementById("name");
   const name = nameInput.value.trim();
   if (!name) return;
-  
+
   const invalidChars = /[\/#?\[\]]/;
   if (invalidChars.test(name)) {
     alert("名前に使えない文字が含まれています。\n使用できない文字: / # ? [ ]");
@@ -85,15 +84,13 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    await addDoc(collection(db, schoolName), {
-      name: name,
-      type: "name",
+    await setDoc(doc(db, schoolName, name), {
       createdAt: serverTimestamp()
     });
     nameInput.value = "";
     await loadNames();
   } catch (error) {
-    console.error("Error adding document: ", error);
+    console.error("Error setting document: ", error);
     alert("名前の登録中にエラーが発生しました。");
   }
 });

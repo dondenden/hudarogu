@@ -1,0 +1,137 @@
+/* 全体 */
+body {
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
+  background: #0f172a; /* ネイビー寄りのダーク */
+  color: #e5e7eb;
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* 見出し */
+h1, h2 {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #3b82f6; /* 青をアクセント */
+}
+
+h2 {
+  font-size: 1.4rem;
+  color: #f9fafb;
+  border-bottom: 2px solid #1e293b;
+  padding-bottom: 5px;
+  margin-top: 2em;
+}
+
+/* ボタン */
+button {
+  background: #1e293b;
+  color: #e5e7eb;
+  border: 1px solid #3b82f6;
+  padding: 8px 14px;
+  margin: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+button:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+button:disabled {
+  background: #475569;
+  border-color: #475569;
+  cursor: not-allowed;
+}
+
+/* フォーム */
+form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #1e293b;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: #f1f5f9;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+input[type="radio"] {
+  width: auto;
+  margin-right: 6px;
+}
+
+/* 表 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.95rem;
+}
+
+th, td {
+  border: 1px solid #334155;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background: #1e293b;
+  color: #f9fafb;
+  font-weight: bold;
+}
+
+td {
+  background: #0f172a;
+}
+
+tr:hover td {
+  background: #1e293b;
+}
+
+/* リスト（履歴） */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul li {
+  background: #1e293b;
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+ul li:hover {
+  background: #334155;
+}
+
+/* 戻るボタン中央配置 */
+#backButton {
+  display: block;
+  margin: 20px auto;
+}

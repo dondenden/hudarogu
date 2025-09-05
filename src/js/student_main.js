@@ -23,6 +23,6 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   watchBtn.addEventListener("click", () => {
-      window.location.href = `https://dondenden.github.io/hudarogu/src/student_match_view.html${currentParams}`;
+      window.location.href = `https://dondenden.github.io/hudarogu/src/student_record${currentParams}`;
   });
 });

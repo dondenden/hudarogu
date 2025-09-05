@@ -1,18 +1,19 @@
 {
   "name": "かるた記録アプリ〜札ログ〜",
   "short_name": "札ログ",
-  "start_url": "/hudarogu/src/index.html",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#3b82f6",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "src/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "src/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

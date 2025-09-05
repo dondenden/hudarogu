@@ -1,0 +1,133 @@
+/* 全体ベース */
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #ffffff);
+    color: #1f2937;
+    min-height: 100vh;
+}
+
+/* タイトル */
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+p#studentInfo {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* フォーム */
+form#matchForm {
+    max-width: 400px;
+    margin: 0 auto 30px auto;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+form label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 5px rgba(59,130,246,0.5);
+}
+
+/* 勝敗ラジオ */
+fieldset {
+    border: 1px solid #cbd5e1;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+fieldset legend {
+    font-weight: 600;
+}
+
+fieldset label {
+    margin-right: 15px;
+    font-weight: normal;
+}
+
+/* ボタン */
+button {
+    width: 100%;
+    padding: 12px 0;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* 戻るボタン個別色 */
+#backButton {
+    background-color: #6b7280;
+    margin-top: 10px;
+}
+
+#backButton:hover {
+    background-color: #4b5563;
+}
+
+/* スマホ対応 */
+@media (max-width: 500px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    p#studentInfo {
+        font-size: 0.95rem;
+    }
+
+    input[type="number"],
+    input[type="date"],
+    select {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+
+    button {
+        font-size: 0.9rem;
+        padding: 10px 0;
+    }
+}

@@ -77,3 +77,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadOpponents();
 });
+backButton.addEventListener("click", () => {
+  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
+});

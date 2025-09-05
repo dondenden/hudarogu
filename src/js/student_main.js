@@ -26,7 +26,7 @@ if (!schoolName || !studentName) {
 }
 
 document.getElementById("studentInfo").textContent =
-  `${schoolName}の${studentName}の結果`;
+  `${schoolName}の${studentName}さん`;
 
 const matchForm = document.getElementById("matchForm");
 const matchList = document.getElementById("matchList");

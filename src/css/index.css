@@ -1,0 +1,50 @@
+/* 全体の背景とフォント */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Yu Gothic", "ヒラギノ角ゴ Pro", sans-serif;
+    background-color: #f7f8fa;
+    color: #333;
+}
+
+/* コンテナで中央揃え */
+.container {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+/* タイトル */
+h1 {
+    font-size: 3rem;
+    margin-bottom: 60px;
+    color: #1f2937;
+}
+
+/* ボタン */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 40px; /* ボタン間の余白 */
+}
+
+button {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #3b82f6; /* 青色 */
+    color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+button:hover {
+    background-color: #2563eb; /* ホバー時の濃い青 */
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}

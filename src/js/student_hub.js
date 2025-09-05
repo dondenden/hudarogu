@@ -106,7 +106,7 @@ loginForm.addEventListener("submit", (e) => {
   }
 
   // ログイン成功
-  window.location.href = `https://dondenden.github.io/hudarogu/src/student_main`
+  window.location.href = `student_main.html?school=${selectedSchool}&student=${selectedStudent}`;
 });
 
 loadSchools();

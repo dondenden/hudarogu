@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <title>生徒メインプラットフォーム</title>
-    </head>
-    <body>
-        <h1>生徒メインプラットフォーム</h1>
-    </body>
+<head>
+  <meta charset="UTF-8">
+  <title>生徒メイン</title>
+  <script type="module" src="js/student_main.jsv?=202509051519"></script>
+</head>
+<body>
+  <h1>生徒メイン</h1>
+  <p id="studentInfo"></p>
+
+  <h2>試合結果を追加</h2>
+  <form id="matchForm">
+    <label>対戦相手: <input type="text" id="opponent" required></label><br>
+    <label>スコア: <input type="text" id="score" required></label><br>
+    <button type="submit">保存</button>
+  </form>
+
+  <h2>試合履歴</h2>
+  <ul id="matchList"></ul>
+</body>
 </html>

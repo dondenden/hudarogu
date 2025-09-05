@@ -3,9 +3,8 @@ import {
   getFirestore,
   collection,
   getDocs,
-  deleteDoc,
-  doc,
   setDoc,
+  doc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -36,7 +35,7 @@ const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
 
-// 🔹 名前一覧表示
+// 🔹 名前一覧表示（passwordDocを除外）
 async function loadNames() {
   list.innerHTML = "";
   const snap = await getDocs(collection(db, schoolName));
@@ -49,23 +48,14 @@ async function loadNames() {
   }
 
   snap.forEach(docSnap => {
-    const data = docSnap.data();
-    const name = docSnap.id; // ← ドキュメントIDをそのまま名前として使う
+    const docId = docSnap.id;
+
+    // 🔹 パスワード用ドキュメントは表示しない
+    if (docId === "passwordDoc") return;
 
     const li = document.createElement("li");
-    li.textContent = `${name} `;
+    li.textContent = docId;
 
-    // 🔹 名前削除ボタン
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "削除";
-    delBtn.addEventListener("click", async () => {
-      if (confirm(`${name} を削除しますか？`)) {
-        await deleteDoc(doc(db, schoolName, name));
-        await loadNames();
-      }
-    });
-
-    li.appendChild(delBtn);
     list.appendChild(li);
   });
 }
@@ -77,10 +67,11 @@ form.addEventListener("submit", async (e) => {
   const name = nameInput.value.trim();
   if (!name) return;
 
+  // Firestoreに使えない文字のチェック
   const invalidChars = /[\/#?\[\]]/;
   if (invalidChars.test(name)) {
     alert("名前に使えない文字が含まれています。\n使用できない文字: / # ? [ ]");
-    return; // 登録中止
+    return;
   }
 
   try {

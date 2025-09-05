@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>試合結果記録</title>
-  <script type="module" src="js/stundet_match.js?v=202509051653"></script>
+  <script type="module" src="js/student_match.js?v=202509051700"></script>
 </head>
 <body>
   <h1>試合結果を記録</h1>
@@ -15,9 +15,15 @@
         <option value="">-- 対戦相手を選択 --</option>
       </select>
     </label><br>
+
     <label>枚差:
       <input type="number" id="score" min="0" required>
     </label><br>
+
+    <label>試合日:
+      <input type="date" id="matchDate" required>
+    </label><br>
+
     <button type="submit">保存</button>
   </form>
 </body>

@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const matchForm = document.getElementById("matchForm");
   const opponentSelect = document.getElementById("opponentSelect");
   const scoreInput = document.getElementById("score");
+  const matchDateInput = document.getElementById("matchDate");
 
   studentInfo.textContent = `${schoolName}の${studentName}さん`;
 
@@ -52,12 +53,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     const opponent = opponentSelect.value;
     const score = scoreInput.value;
-    if (!opponent || score === "") return;
+    const date = matchDateInput.value; // YYYY-MM-DD
+
+    if (!opponent || score === "" || !date) return;
 
     try {
       await addDoc(collection(db, schoolName, studentName, "matches"), {
         opponent,
         score: Number(score),
+        date,                     // ← 日付を保存
         createdAt: serverTimestamp()
       });
       alert("試合結果を保存しました！");

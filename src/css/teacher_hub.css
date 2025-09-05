@@ -12,7 +12,7 @@ body {
 }
 
 /* コンテナ */
-body > div, body > form {
+.container {
     text-align: center;
     padding: 40px 20px;
     background-color: rgba(255,255,255,0.95);

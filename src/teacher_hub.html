@@ -4,24 +4,26 @@
   <meta charset="UTF-8">
   <title>学校ログイン/登録</title>
   <script type="module" src="js/teacher_hub.js?v=202509051447"></script>
-  <link rel="stylesheet" href="css/teacher_hub.css?v=3">
+  <link rel="stylesheet" href="css/teacher_hub.css?v=4">
 </head>
 <body>
-  <h1>学校ログイン / 新規登録</h1>
-  <form id="schoolForm">
-    <label>学校名: <input type="text" id="schoolName" required></label><br>
+  <div class="container">
+    <h1>学校ログイン / 新規登録</h1>
+    <form id="schoolForm">
+      <label>学校名: <input type="text" id="schoolName" required></label><br>
 
-    <!-- 最初は非表示 -->
-    <div id="passwordWrapper" style="display:none;">
-      <label id="passwordLabel">
-        パスワード: 
-        <input type="password" id="schoolPassword">
-        <button type="button" id="togglePassword">👁️</button>
-      </label>
-    </div>
+      <!-- 最初は非表示 -->
+      <div id="passwordWrapper" style="display:none;">
+        <label id="passwordLabel">
+          パスワード: 
+          <input type="password" id="schoolPassword">
+          <button type="button" id="togglePassword">👁️</button>
+        </label>
+      </div>
 
-    <button type="submit">送信</button>
-  </form>
-  <button id="backButton">戻る</button>
+      <button type="submit">送信</button>
+    </form>
+    <button id="backButton">戻る</button>
+  </div>
 </body>
 </html>

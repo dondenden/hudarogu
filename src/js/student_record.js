@@ -81,5 +81,10 @@ async function loadMatches() {
   });
 }
 
+// 🔹 戻るボタン処理
+backButton.addEventListener("click", () => {
+  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
+});
+
 // 初期ロード
 loadMatches();

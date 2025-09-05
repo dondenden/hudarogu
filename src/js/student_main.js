@@ -25,4 +25,9 @@ window.addEventListener("DOMContentLoaded", () => {
   watchBtn.addEventListener("click", () => {
       window.location.href = `https://dondenden.github.io/hudarogu/src/student_record${currentParams}`;
   });
-});
+
+  // 🔹 戻るボタン処理
+  backButton.addEventListener("click", () => {
+    window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
+  });
+})

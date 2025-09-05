@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       alert("試合結果を保存しました！");
       matchForm.reset();
+      window.location.href = `https://dondenden.github.io/hudarogu/src/student_main.html${currentParams}`
     } catch (error) {
       console.error("保存エラー:", error);
       alert("保存に失敗しました");

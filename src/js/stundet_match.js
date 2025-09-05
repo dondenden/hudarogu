@@ -30,14 +30,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const matchForm = document.getElementById("matchForm");
   const opponentSelect = document.getElementById("opponentSelect");
   const scoreInput = document.getElementById("score");
-  const scoreValue = document.getElementById("scoreValue");
 
   studentInfo.textContent = `${schoolName}の${studentName}さん`;
-
-  // スライダーの値表示
-  scoreInput.addEventListener("input", () => {
-    scoreValue.textContent = scoreInput.value;
-  });
 
   // 対戦相手ロード
   async function loadOpponents() {
@@ -58,17 +52,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     const opponent = opponentSelect.value;
     const score = scoreInput.value;
-    if (!opponent) return;
+    if (!opponent || score === "") return;
 
     try {
       await addDoc(collection(db, schoolName, studentName, "matches"), {
         opponent,
-        score,
+        score: Number(score),
         createdAt: serverTimestamp()
       });
       alert("試合結果を保存しました！");
       matchForm.reset();
-      scoreValue.textContent = scoreInput.value; // 初期値表示
     } catch (error) {
       console.error("保存エラー:", error);
       alert("保存に失敗しました");

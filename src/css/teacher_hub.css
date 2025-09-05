@@ -1,0 +1,123 @@
+/* 全体ベース */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #ffffff);
+    color: #1f2937;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* コンテナ */
+body > div, body > form {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 90%;
+}
+
+/* タイトル */
+h1 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* フォームのラベルと入力 */
+label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 5px rgba(59,130,246,0.5);
+}
+
+/* ボタン */
+button {
+    padding: 12px 30px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* パスワード切替ボタンを小さめに */
+#togglePassword {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    margin-left: 5px;
+}
+
+/* パスワード欄をインラインに */
+#passwordWrapper input,
+#passwordWrapper button {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* 戻るボタンを目立たせる */
+#backButton {
+    background-color: #6b7280;
+    margin-top: 20px;
+}
+
+#backButton:hover {
+    background-color: #4b5563;
+}
+
+/* スマホ対応 */
+@media (max-width: 500px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}

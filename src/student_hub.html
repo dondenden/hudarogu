@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>生徒ログイン</title>
+</head>
+<body>
+  <h1>生徒ログイン</h1>
+
+  <form id="loginForm">
+    <label>学校名:
+      <select id="schoolSelect">
+        <option value="">-- 選択してください --</option>
+      </select>
+    </label>
+    <br><br>
+
+    <div id="passwordWrapper" style="display:none;">
+      <label>パスワード:
+        <input type="password" id="schoolPassword" required>
+        <button type="button" id="togglePassword">👁️</button>
+      </label>
+      <br><br>
+    </div>
+
+    <label>生徒名:
+      <select id="studentSelect" disabled>
+        <option value="">-- 学校を選んでください --</option>
+      </select>
+    </label>
+    <br><br>
+    <button type="submit">ログイン</button>
+  </form>
+
+  <script type="module" src="js/student_login.js"></script>
+</body>
+</html>

@@ -11,7 +11,12 @@
 
   <h2>試合結果を追加</h2>
   <form id="matchForm">
-    <label>対戦相手: <input type="text" id="opponent" required></label><br>
+    <label>対戦相手:
+        <select id="opponentSelect" required>
+            <option value="">-- 対戦相手を選択 --</option>
+        </select>
+    </label><br>
+    
     <label>スコア: <input type="text" id="score" required></label><br>
     <button type="submit">保存</button>
   </form>

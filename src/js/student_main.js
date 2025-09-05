@@ -28,14 +28,28 @@ if (!schoolName || !studentName) {
 document.getElementById("studentInfo").textContent =
   `${schoolName}の${studentName}の結果`;
 
-// HTML要素参照
 const matchForm = document.getElementById("matchForm");
 const matchList = document.getElementById("matchList");
+const opponentSelect = document.getElementById("opponentSelect");
 
-// 試合結果保存
+// 🔹 対戦相手セレクトボックスを作成
+async function loadOpponents() {
+  opponentSelect.innerHTML = '<option value="">-- 対戦相手を選択 --</option>';
+  const snap = await getDocs(collection(db, schoolName));
+  snap.forEach(docSnap => {
+    const name = docSnap.id;
+    if (name === "passwordDoc" || name === studentName) return; // 自分とパスワードDocは除外
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    opponentSelect.appendChild(option);
+  });
+}
+
+// 🔹 試合結果保存
 matchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const opponent = document.getElementById("opponent").value.trim();
+  const opponent = opponentSelect.value;
   const score = document.getElementById("score").value.trim();
   if (!opponent || !score) return;
 
@@ -54,7 +68,7 @@ matchForm.addEventListener("submit", async (e) => {
   }
 });
 
-// 試合結果読み込み
+// 🔹 試合結果読み込み
 async function loadMatches() {
   matchList.innerHTML = "";
   const snap = await getDocs(collection(db, schoolName, studentName, "matches"));
@@ -72,4 +86,5 @@ async function loadMatches() {
 }
 
 // 初期ロード
+loadOpponents();
 loadMatches();

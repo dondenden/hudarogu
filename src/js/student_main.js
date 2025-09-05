@@ -26,7 +26,7 @@ if (!schoolName || !studentName) {
 }
 
 document.getElementById("studentInfo").textContent =
-  `学校: ${schoolName} / 生徒: ${studentName}`;
+  `${schoolName}の${studentName}の結果`;
 
 // HTML要素参照
 const matchForm = document.getElementById("matchForm");

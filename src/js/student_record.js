@@ -19,19 +19,23 @@ const db = getFirestore(app);
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 const studentName = params.get("student");
+const currentParams = window.location.search; // ←追加
 
 if (!schoolName || !studentName) {
   alert("ログイン情報がありません。");
   window.location.href = 'index.html';
 }
 
-document.getElementById("studentInfo").textContent = `${schoolName}の${studentName}さん`;
-
 // HTML要素参照
+const studentInfo = document.getElementById("studentInfo");
 const matchList = document.getElementById("matchList");
 const overallStats = document.getElementById("overallStats");
 const perOpponentStats = document.getElementById("perOpponentStats");
+const backButton = document.getElementById("backButton");
 
+studentInfo.textContent = `${schoolName}の${studentName}さん`;
+
+// データ読み込み
 async function loadMatches() {
   const matchesSnap = await getDocs(query(
     collection(db, schoolName, studentName, "matches"),
@@ -43,7 +47,7 @@ async function loadMatches() {
 
   // 全体勝率
   const total = matches.length;
-  const wins = matches.filter(m => m.result === "win").length;
+  const wins = matches.filter(m => m.result === "勝ち").length; // ←修正
   overallStats.textContent = total
     ? `全体勝率: ${(wins / total * 100).toFixed(1)}% (${wins}/${total})`
     : "試合データがありません";
@@ -57,7 +61,7 @@ async function loadMatches() {
 
   perOpponentStats.innerHTML = "";
   for (const [opponent, games] of Object.entries(opponentMap)) {
-    const winCount = games.filter(g => g.result === "win").length;
+    const winCount = games.filter(g => g.result === "勝ち").length;
     const totalGames = games.length;
     const avgScore = (games.reduce((sum,g)=>sum+g.score,0)/totalGames).toFixed(1);
 
@@ -74,16 +78,16 @@ async function loadMatches() {
   // 試合履歴（最新順）
   matchList.innerHTML = "";
   matches.forEach(m => {
-    const dateStr = m.createdAt?.toDate?.()?.toLocaleDateString() || "日付不明";
+    const dateStr = m.date || "日付不明";
     const li = document.createElement("li");
     li.textContent = `${dateStr} - 対戦相手: ${m.opponent}, 枚差: ${m.score}, 結果: ${m.result}`;
     matchList.appendChild(li);
   });
 }
 
-// 🔹 戻るボタン処理
+// 戻るボタン
 backButton.addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
+  window.location.href = `https://dondenden.github.io/hudarogu/src/student_main.html${currentParams}`;
 });
 
 // 初期ロード

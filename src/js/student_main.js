@@ -1,5 +1,4 @@
 window.addEventListener("DOMContentLoaded", () => {
-  // URLパラメータ取得
   const params = new URLSearchParams(window.location.search);
   const schoolName = params.get("school");
   const studentName = params.get("student");
@@ -10,15 +9,12 @@ window.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const currentParams = window.location.search; // 現在のURLパラメータを保持
+  const currentParams = window.location.search;
 
   // h1 に表示
-  const h1 = document.getElementById("name");
-  if (h1) {
-    h1.textContent = `${schoolName}の${studentName}さんのメインフォーム`;
-  }
+  const h1 = document.getElementById("studentHeader");
+  h1.textContent = `${schoolName}の${studentName}さんのメインフォーム`;
 
-  // ボタン処理
   const recordBtn = document.getElementById("record");
   const watchBtn = document.getElementById("watch");
 

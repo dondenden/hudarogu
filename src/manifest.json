@@ -1,8 +1,8 @@
 {
   "name": "かるた記録アプリ〜札ログ〜",
   "short_name": "札ログ",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/hudarogu/index.html",
+  "scope": "/hudarogu/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#3b82f6",

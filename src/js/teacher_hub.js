@@ -104,7 +104,7 @@ form.addEventListener("submit", async (e) => {
     }
 
     // 成功したら名前登録画面へ遷移
-    window.location.href = `https://dondenden.github.io/hudarogu/src/teacher_main.html?school=${encodeURIComponent(schoolName)}`;
+    window.location.href = `https://dondenden.github.io/hudarogu/teacher_main.html?school=${encodeURIComponent(schoolName)}`;
   } catch (error) {
     console.error("Error: ", error);
     alert("エラーが発生しました。");
@@ -113,5 +113,5 @@ form.addEventListener("submit", async (e) => {
 
 // 戻るボタン処理
 backButton.addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html'; // トップページに戻る
+  window.location.href = 'https://dondenden.github.io/hudarogu/index.html'; // トップページに戻る
 });

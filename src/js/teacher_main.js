@@ -88,7 +88,7 @@ form.addEventListener("submit", async (e) => {
 
 // 🔹 戻るボタン処理
 backButton.addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
+  window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
 });
 
 // 🔹 初回表示

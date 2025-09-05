@@ -19,15 +19,15 @@ window.addEventListener("DOMContentLoaded", () => {
   const watchBtn = document.getElementById("watch");
 
   recordBtn.addEventListener("click", () => {
-      window.location.href = `https://dondenden.github.io/hudarogu/src/student_match.html${currentParams}`;
+      window.location.href = `https://dondenden.github.io/hudarogu/student_match.html${currentParams}`;
   });
 
   watchBtn.addEventListener("click", () => {
-      window.location.href = `https://dondenden.github.io/hudarogu/src/student_record${currentParams}`;
+      window.location.href = `https://dondenden.github.io/hudarogu/student_record${currentParams}`;
   });
 
   // 🔹 戻るボタン処理
   backButton.addEventListener("click", () => {
-    window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
+    window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
   });
 })

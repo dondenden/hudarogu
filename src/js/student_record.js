@@ -158,7 +158,7 @@ function createCharts(matches, opponentMap, labels, scores) {
 
 // 戻るボタン
 backButton.addEventListener("click", () => {
-  window.location.href = `https://dondenden.github.io/hudarogu/src/student_main.html${currentParams}`;
+  window.location.href = `https://dondenden.github.io/hudarogu/student_main.html${currentParams}`;
 });
 
 // 初期ロード

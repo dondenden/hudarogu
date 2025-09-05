@@ -26,19 +26,16 @@ if (!schoolName || !studentName) {
   window.location.href = 'index.html';
 }
 
-// HTML要素
+// HTML要素参照
 const studentInfo = document.getElementById("studentInfo");
 const matchList = document.getElementById("matchList");
 const overallStats = document.getElementById("overallStats");
 const perOpponentStats = document.getElementById("perOpponentStats");
 const backButton = document.getElementById("backButton");
 
-const matchChartCanvas = document.getElementById("matchChart").getContext('2d');
-const opponentChartCanvas = document.getElementById("opponentChart").getContext('2d');
-const scoreChartCanvas = document.getElementById("scoreChart").getContext('2d');
-
 studentInfo.textContent = `${schoolName}の${studentName}さん`;
 
+// データ読み込み
 async function loadMatches() {
   const matchesSnap = await getDocs(query(
     collection(db, schoolName, studentName, "matches"),
@@ -51,9 +48,7 @@ async function loadMatches() {
   const total = matches.length;
   const wins = matches.filter(m => m.result === "勝ち").length;
 
-  const avgScore = total
-    ? (matches.reduce((sum,m)=>sum + Number(m.score || 0),0)/total).toFixed(1)
-    : 0;
+  const avgScore = total ? (matches.reduce((sum,m)=>sum+m.score,0)/total).toFixed(1) : 0;
 
   overallStats.textContent = total
     ? `全体勝率: ${(wins / total * 100).toFixed(1)}% (${wins}/${total}), 平均枚差: ${avgScore}`
@@ -67,11 +62,6 @@ async function loadMatches() {
   });
 
   perOpponentStats.innerHTML = "";
-  const opponentLabels = [];
-  const opponentWinRates = [];
-  const winScores = [];
-  const loseScores = [];
-
   for (const [opponent, games] of Object.entries(opponentMap)) {
     const winGames = games.filter(g => g.result === "勝ち");
     const loseGames = games.filter(g => g.result === "負け");
@@ -79,12 +69,8 @@ async function loadMatches() {
     const winCount = winGames.length;
     const totalGames = games.length;
 
-    const avgWinScore = winGames.length
-      ? (winGames.reduce((sum,g)=>sum + Number(g.score || 0),0)/winGames.length).toFixed(1)
-      : 0;
-    const avgLoseScore = loseGames.length
-      ? (loseGames.reduce((sum,g)=>sum + Number(g.score || 0),0)/loseGames.length).toFixed(1)
-      : 0;
+    const avgWinScore = winGames.length ? (winGames.reduce((sum,g)=>sum+g.score,0)/winGames.length).toFixed(1) : "-";
+    const avgLoseScore = loseGames.length ? (loseGames.reduce((sum,g)=>sum+g.score,0)/loseGames.length).toFixed(1) : "-";
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -95,15 +81,12 @@ async function loadMatches() {
       <td class="lose">${avgLoseScore}</td>
     `;
     perOpponentStats.appendChild(tr);
-
-    opponentLabels.push(opponent);
-    opponentWinRates.push((winCount/totalGames*100).toFixed(1));
-    winScores.push(avgWinScore);
-    loseScores.push(avgLoseScore);
   }
 
-  // 試合履歴
+  // 試合履歴（テーブル形式）
   matchList.innerHTML = "";
+  const labels = [];
+  const scores = [];
   matches.forEach(m => {
     const dateStr = m.date || "日付不明";
     const resultClass = m.result === "勝ち" ? "win" : "lose";
@@ -116,63 +99,96 @@ async function loadMatches() {
       <td class="${resultClass}">${m.result}</td>
     `;
     matchList.appendChild(tr);
+
+    // グラフ用
+    labels.push(dateStr);
+    scores.push(m.score);
   });
 
-  // 日付ごとの枚差バー
-  new Chart(matchChartCanvas, {
-    type: 'bar',
+  // Chart.js グラフ描画
+  createCharts(matches, opponentMap, labels, scores);
+}
+
+// グラフ作成関数
+function createCharts(matches, opponentMap, labels, scores) {
+  // ① 日付ごとの枚差
+  const matchCtx = document.getElementById('matchChart').getContext('2d');
+  new Chart(matchCtx, {
+    type: 'line',
     data: {
-      labels: matches.map(m=>m.date||"不明"),
+      labels,
       datasets: [{
         label: '枚差',
-        data: matches.map(m=>Number(m.score||0)),
-        backgroundColor: matches.map(m=>m.result==="勝ち"?"rgba(16,185,129,0.5)":"rgba(239,68,68,0.5)"),
-        borderColor: matches.map(m=>m.result==="勝ち"?"rgba(16,185,129,1)":"rgba(239,68,68,1)"),
-        borderWidth:1
+        data: scores,
+        borderColor: '#3b82f6', // 学校カラー
+        backgroundColor: 'rgba(59,130,246,0.2)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: '#2563eb'
       }]
     },
     options: {
-      responsive:true,
-      plugins:{ legend:{ display:false } },
-      scales: { y:{ beginAtZero:true, title:{ display:true, text:"枚差" } }, x:{ title:{ display:true, text:"日付" } } }
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
     }
   });
 
-  // 対戦相手別 勝率円グラフ
-  new Chart(opponentChartCanvas, {
-    type:'doughnut',
-    data:{
-      labels:opponentLabels,
-      datasets:[{
-        label:'勝率',
-        data:opponentWinRates,
-        backgroundColor:opponentLabels.map(_=>`hsl(${Math.random()*360},70%,60%)`)
+  // ② 対戦相手別 勝率
+  const opponentLabels = Object.keys(opponentMap);
+  const opponentWinRates = opponentLabels.map(opponent => {
+    const games = opponentMap[opponent];
+    const winCount = games.filter(g => g.result === "勝ち").length;
+    return ((winCount / games.length) * 100).toFixed(1);
+  });
+
+  const opponentCtx = document.getElementById('opponentChart').getContext('2d');
+  new Chart(opponentCtx, {
+    type: 'bar',
+    data: {
+      labels: opponentLabels,
+      datasets: [{
+        label: '勝率 (%)',
+        data: opponentWinRates,
+        backgroundColor: '#10b981', // 勝率カラー
       }]
     },
-    options:{ responsive:true, plugins:{ legend:{ position:'bottom' } } }
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, max: 100 } }
+    }
   });
 
-  // 対戦相手別 勝ち/負け平均枚差棒グラフ
-  new Chart(scoreChartCanvas, {
-    type:'bar',
-    data:{
-      labels:opponentLabels,
-      datasets:[
-        { label:'勝ち平均枚差', data:winScores, backgroundColor:'rgba(16,185,129,0.7)' },
-        { label:'負け平均枚差', data:loseScores, backgroundColor:'rgba(239,68,68,0.7)' }
+  // ③ 対戦相手別 勝ち/負け平均枚差
+  const avgWinScores = opponentLabels.map(opponent => {
+    const winGames = opponentMap[opponent].filter(g => g.result === "勝ち");
+    return winGames.length ? (winGames.reduce((sum,g)=>sum+g.score,0)/winGames.length).toFixed(1) : 0;
+  });
+  const avgLoseScores = opponentLabels.map(opponent => {
+    const loseGames = opponentMap[opponent].filter(g => g.result === "負け");
+    return loseGames.length ? (loseGames.reduce((sum,g)=>sum+g.score,0)/loseGames.length).toFixed(1) : 0;
+  });
+
+  const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+  new Chart(scoreCtx, {
+    type: 'bar',
+    data: {
+      labels: opponentLabels,
+      datasets: [
+        { label: '勝ち平均枚差', data: avgWinScores, backgroundColor: '#3b82f6' },
+        { label: '負け平均枚差', data: avgLoseScores, backgroundColor: '#ef4444' }
       ]
     },
-    options:{
-      responsive:true,
-      plugins:{ legend:{ position:'bottom' } },
-      scales:{ y:{ beginAtZero:true, title:{ display:true, text:"平均枚差" } } }
-    }
+    options: { responsive: true, plugins: { legend: { position: 'top' } } }
   });
 }
 
-// 戻る
+// 戻るボタン
 backButton.addEventListener("click", () => {
   window.location.href = `https://dondenden.github.io/hudarogu/src/student_main.html${currentParams}`;
 });
 
+// 初期ロード
 loadMatches();

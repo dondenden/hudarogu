@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Firebase 設定
 const firebaseConfig = {
@@ -15,7 +15,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// URLパラメータ取得
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 const studentName = params.get("student");
@@ -27,35 +26,70 @@ if (!schoolName || !studentName) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const studentInfo = document.getElementById("studentInfo");
+  const overallStats = document.getElementById("overallStats");
+  const studentStatsList = document.getElementById("studentStatsList");
   const matchList = document.getElementById("matchList");
 
-  studentInfo.textContent = `${schoolName}の${studentName}さんの試合結果`;
+  studentInfo.textContent = `${schoolName}の${studentName}さん`;
 
-  // 試合結果取得
-  async function loadMatches() {
-    matchList.innerHTML = "<tr><td colspan='4'>読み込み中...</td></tr>";
-    const q = query(collection(db, schoolName, studentName, "matches"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
+  // 試合履歴と統計をロード
+  const studentSnap = await getDocs(collection(db, schoolName));
 
-    if (snap.empty) {
-      matchList.innerHTML = "<tr><td colspan='4'>まだ試合結果がありません</td></tr>";
-      return;
-    }
+  let totalMatches = 0;
+  let totalWins = 0;
+  let totalScoreDiffWin = 0;
+  let totalScoreDiffLose = 0;
 
-    matchList.innerHTML = "";
-    snap.forEach(docSnap => {
-      const data = docSnap.data();
-      const tr = document.createElement("tr");
+  const studentStats = [];
 
-      const date = data.date || "";
-      const opponent = data.opponent || "";
-      const score = data.score !== undefined ? data.score : "";
-      const result = data.result || "";
+  for (const docSnap of studentSnap.docs) {
+    const name = docSnap.id;
+    if (name === "passwordDoc") continue;
 
-      tr.innerHTML = `<td>${date}</td><td>${opponent}</td><td>${score}</td><td>${result}</td>`;
-      matchList.appendChild(tr);
+    const matchesSnap = await getDocs(collection(db, schoolName, name, "matches"));
+    if (matchesSnap.empty) continue;
+
+    let wins = 0;
+    let losses = 0;
+    let scoreWinSum = 0;
+    let scoreLoseSum = 0;
+
+    matchesSnap.forEach(matchDoc => {
+      const data = matchDoc.data();
+      if (data.result === "勝") {
+        wins++;
+        scoreWinSum += data.score;
+      } else if (data.result === "負") {
+        losses++;
+        scoreLoseSum += data.score;
+      }
+
+      // 生徒の試合履歴を表示
+      if (name === studentName) {
+        const li = document.createElement("li");
+        li.textContent = `${data.date} | ${data.opponent} | ${data.result} | 枚差: ${data.score}`;
+        matchList.appendChild(li);
+      }
     });
+
+    studentStats.push({
+      name,
+      winRate: wins / (wins + losses) * 100,
+      avgWinScore: wins ? scoreWinSum / wins : 0,
+      avgLoseScore: losses ? scoreLoseSum / losses : 0
+    });
+
+    totalMatches += wins + losses;
+    totalWins += wins;
+    totalScoreDiffWin += scoreWinSum;
+    totalScoreDiffLose += scoreLoseSum;
   }
 
-  await loadMatches();
+  overallStats.textContent = `全体勝率: ${totalMatches ? ((totalWins / totalMatches) * 100).toFixed(2) : 0}% | 平均勝ち枚差: ${totalWins ? (totalScoreDiffWin / totalWins).toFixed(2) : 0} | 平均負け枚差: ${totalMatches - totalWins ? (totalScoreDiffLose / (totalMatches - totalWins)).toFixed(2) : 0}`;
+
+  studentStats.forEach(stat => {
+    const li = document.createElement("li");
+    li.textContent = `${stat.name} | 勝率: ${stat.winRate.toFixed(2)}% | 平均勝ち枚差: ${stat.avgWinScore.toFixed(2)} | 平均負け枚差: ${stat.avgLoseScore.toFixed(2)}`;
+    studentStatsList.appendChild(li);
+  });
 });

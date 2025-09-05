@@ -2,25 +2,20 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>試合結果表示</title>
-  <script type="module" src="js/student_record.js?v=202509051209"></script>
+  <title>試合結果閲覧</title>
+  <script type="module" src="js/student_record.js?v=202509051720"></script>
 </head>
 <body>
-  <h1>試合結果一覧</h1>
+  <h1>試合結果閲覧</h1>
   <p id="studentInfo"></p>
 
-  <table border="1">
-    <thead>
-      <tr>
-        <th>日付</th>
-        <th>対戦相手</th>
-        <th>枚差</th>
-        <th>勝敗</th>
-      </tr>
-    </thead>
-    <tbody id="matchList">
-      <tr><td colspan="4">読み込み中...</td></tr>
-    </tbody>
-  </table>
+  <h2>全体統計</h2>
+  <p id="overallStats"></p>
+
+  <h2>個人別統計</h2>
+  <ul id="studentStatsList"></ul>
+
+  <h2>試合履歴</h2>
+  <ul id="matchList"></ul>
 </body>
 </html>

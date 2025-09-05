@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>札ログ</title>
-  <link rel="stylesheet" href="css/index.css?v=5">
-  <script type="module" src="js/index.js?v=5"></script>
-  <link rel="manifest" href="manifest.json?v=6">
+  <!-- ✅ src/css に合わせる -->
+  <link rel="stylesheet" href="src/css/index.css?v=5">
+  <!-- ✅ src/js に合わせる（1回だけでOK） -->
+  <script type="module" src="src/js/index.js?v=5"></script>
+  <!-- ✅ src/manifest.json に合わせる -->
+  <link rel="manifest" href="src/manifest.json?v=6">
 </head>
 <body>
   <div class="container">
@@ -16,13 +19,12 @@
     </div>
   </div>
 
-  <script type="module" src="js/index.js?v=5"></script>
-
   <!-- Service Worker 登録 -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/hudarogu/src/sw.js')
+        // ✅ ./src/sw.js に修正（相対パス推奨）
+        navigator.serviceWorker.register('./src/sw.js')
           .then(registration => {
             console.log('Service Worker 登録成功:', registration);
           })

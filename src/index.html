@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>札ログ</title>
-  <link rel="stylesheet" href="css/index.css?v=3">
-  <!-- PWA用 -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="/hudarogu/css/index.css?v=3">
+  
+  <!-- PWA 用 manifest -->
+  <link rel="manifest" href="/hudarogu/manifest.json?v=3">
   <meta name="theme-color" content="#3b82f6">
 </head>
 <body>
@@ -17,13 +18,13 @@
     </div>
   </div>
 
-  <script type="module" src="js/index.js?v=2"></script>
+  <script type="module" src="/hudarogu/js/index.js?v=2"></script>
 
-  <!-- Service Worker登録 -->
+  <!-- Service Worker 登録 -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('/hudarogu/sw.js')
           .then(registration => {
             console.log('Service Worker 登録成功:', registration);
           })

@@ -1,10 +1,10 @@
 const CACHE_NAME = 'hudarogu-cache-v1';
 const URLS_TO_CACHE = [
-  '/hudarogu/',
-  '/hudarogu/index.html',
-  '/hudarogu/manifest.json',
-  '/hudarogu/css/index.css',
-  '/hudarogu/js/index.js',
+  '/hudarogu/src/',
+  '/hudarogu/src/index.html',
+  '/hudarogu/src/manifest.json',
+  '/hudarogu/src/css/index.css',
+  '/hudarogu/src/js/index.js',
   '/hudarogu/icons/icon-192.png',
   '/hudarogu/icons/icon-512.png'
 ];

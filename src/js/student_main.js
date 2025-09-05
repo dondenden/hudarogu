@@ -19,7 +19,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const watchBtn = document.getElementById("watch");
 
   recordBtn.addEventListener("click", () => {
-      window.location.href = `https://dondenden.github.io/hudarogu/src/student_match_record.html${currentParams}`;
+      window.location.href = `https://dondenden.github.io/hudarogu/src/student_match.html${currentParams}`;
   });
 
   watchBtn.addEventListener("click", () => {

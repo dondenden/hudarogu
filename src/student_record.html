@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>試合結果表示</title>
-  <script type="module" src="js/student_record.js?v=202509060033"></script>
-  <link rel="stylesheet" href="css/student_record.css?v=1">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="js/student_record.js?v=202509060129"></script>
+  <link rel="stylesheet" href="css/student_record.css?v=5">
 </head>
 <body>
   <h1 id="studentInfo"></h1>
@@ -38,6 +40,22 @@
     </thead>
     <tbody id="matchList"></tbody>
   </table>
+
+  <h2>グラフ</h2>
+  <div class="charts-container">
+    <div class="chart-card">
+      <h3>日付ごとの枚差</h3>
+      <canvas id="matchChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>対戦相手別 勝率</h3>
+      <canvas id="opponentChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>対戦相手別 勝ち/負け平均枚差</h3>
+      <canvas id="scoreChart"></canvas>
+    </div>
+  </div>
 
   <div class="center">
     <button id="backButton">戻る</button>

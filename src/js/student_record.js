@@ -1,3 +1,4 @@
+// student_record.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -48,7 +49,8 @@ async function loadMatches() {
   const total = matches.length;
   const wins = matches.filter(m => m.result === "勝ち").length;
 
-  const avgScore = total ? (matches.reduce((sum,m)=>sum+m.score,0)/total).toFixed(1) : 0;
+  // 🔹 数値変換を追加
+  const avgScore = total ? (matches.reduce((sum,m)=>sum + Number(m.score),0)/total).toFixed(1) : 0;
 
   overallStats.textContent = total
     ? `全体勝率: ${(wins / total * 100).toFixed(1)}% (${wins}/${total}), 平均枚差: ${avgScore}`
@@ -69,8 +71,8 @@ async function loadMatches() {
     const winCount = winGames.length;
     const totalGames = games.length;
 
-    const avgWinScore = winGames.length ? (winGames.reduce((sum,g)=>sum+g.score,0)/winGames.length).toFixed(1) : "-";
-    const avgLoseScore = loseGames.length ? (loseGames.reduce((sum,g)=>sum+g.score,0)/loseGames.length).toFixed(1) : "-";
+    const avgWinScore = winGames.length ? (winGames.reduce((sum,g)=>sum + Number(g.score),0)/winGames.length).toFixed(1) : "-";
+    const avgLoseScore = loseGames.length ? (loseGames.reduce((sum,g)=>sum + Number(g.score),0)/loseGames.length).toFixed(1) : "-";
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -83,7 +85,7 @@ async function loadMatches() {
     perOpponentStats.appendChild(tr);
   }
 
-  // 試合履歴（テーブル形式）
+  // 試合履歴
   matchList.innerHTML = "";
   const labels = [];
   const scores = [];
@@ -100,88 +102,57 @@ async function loadMatches() {
     `;
     matchList.appendChild(tr);
 
-    // グラフ用
     labels.push(dateStr);
-    scores.push(m.score);
+    scores.push(Number(m.score)); // 🔹 数値化
   });
 
-  // Chart.js グラフ描画
+  // グラフ描画
   createCharts(matches, opponentMap, labels, scores);
 }
 
-// グラフ作成関数
+// Chart.js グラフ作成
 function createCharts(matches, opponentMap, labels, scores) {
-  // ① 日付ごとの枚差
+  // 日付ごとの枚差
   const matchCtx = document.getElementById('matchChart').getContext('2d');
   new Chart(matchCtx, {
     type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: '枚差',
-        data: scores,
-        borderColor: '#3b82f6', // 学校カラー
-        backgroundColor: 'rgba(59,130,246,0.2)',
-        tension: 0.3,
-        fill: true,
-        pointRadius: 4,
-        pointBackgroundColor: '#2563eb'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } }
-    }
+    data: { labels, datasets: [{ label:'枚差', data:scores, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)', tension:0.3, fill:true, pointRadius:4, pointBackgroundColor:'#2563eb' }] },
+    options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
   });
 
-  // ② 対戦相手別 勝率
+  // 対戦相手別勝率
   const opponentLabels = Object.keys(opponentMap);
   const opponentWinRates = opponentLabels.map(opponent => {
     const games = opponentMap[opponent];
-    const winCount = games.filter(g => g.result === "勝ち").length;
-    return ((winCount / games.length) * 100).toFixed(1);
+    const winCount = games.filter(g => g.result==='勝ち').length;
+    return ((winCount / games.length)*100).toFixed(1);
   });
 
   const opponentCtx = document.getElementById('opponentChart').getContext('2d');
   new Chart(opponentCtx, {
-    type: 'bar',
-    data: {
-      labels: opponentLabels,
-      datasets: [{
-        label: '勝率 (%)',
-        data: opponentWinRates,
-        backgroundColor: '#10b981', // 勝率カラー
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, max: 100 } }
-    }
+    type:'bar',
+    data:{labels:opponentLabels, datasets:[{label:'勝率 (%)', data:opponentWinRates, backgroundColor:'#10b981'}]},
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, max:100}}}
   });
 
-  // ③ 対戦相手別 勝ち/負け平均枚差
+  // 対戦相手別 勝ち/負け平均枚差
   const avgWinScores = opponentLabels.map(opponent => {
-    const winGames = opponentMap[opponent].filter(g => g.result === "勝ち");
-    return winGames.length ? (winGames.reduce((sum,g)=>sum+g.score,0)/winGames.length).toFixed(1) : 0;
+    const winGames = opponentMap[opponent].filter(g => g.result==='勝ち');
+    return winGames.length ? (winGames.reduce((sum,g)=>sum+Number(g.score),0)/winGames.length).toFixed(1) : 0;
   });
   const avgLoseScores = opponentLabels.map(opponent => {
-    const loseGames = opponentMap[opponent].filter(g => g.result === "負け");
-    return loseGames.length ? (loseGames.reduce((sum,g)=>sum+g.score,0)/loseGames.length).toFixed(1) : 0;
+    const loseGames = opponentMap[opponent].filter(g => g.result==='負け');
+    return loseGames.length ? (loseGames.reduce((sum,g)=>sum+Number(g.score),0)/loseGames.length).toFixed(1) : 0;
   });
 
   const scoreCtx = document.getElementById('scoreChart').getContext('2d');
   new Chart(scoreCtx, {
-    type: 'bar',
-    data: {
-      labels: opponentLabels,
-      datasets: [
-        { label: '勝ち平均枚差', data: avgWinScores, backgroundColor: '#3b82f6' },
-        { label: '負け平均枚差', data: avgLoseScores, backgroundColor: '#ef4444' }
-      ]
-    },
-    options: { responsive: true, plugins: { legend: { position: 'top' } } }
+    type:'bar',
+    data:{labels:opponentLabels, datasets:[
+      {label:'勝ち平均枚差', data:avgWinScores, backgroundColor:'#3b82f6'},
+      {label:'負け平均枚差', data:avgLoseScores, backgroundColor:'#ef4444'}
+    ]},
+    options:{responsive:true, plugins:{legend:{position:'top'}}}
   });
 }
 

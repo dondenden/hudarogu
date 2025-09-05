@@ -1,13 +1,23 @@
-const currentParams = window.location.search; // 現在のURLパラメータを取得
+// URLパラメータ取得
+const params = new URLSearchParams(window.location.search);
+const schoolName = params.get("school");
+const studentName = params.get("student");
+
+if (!schoolName || !studentName) {
+  alert("ログイン情報がありません。ログインし直してください。");
+  window.location.href = 'index.html';
+}
+
+const currentParams = window.location.search; // 現在のURLパラメータを保持
 
 document.getElementById("name").textContent = `${schoolName}の${studentName}さんのメインフォーム`;
 
 document.getElementById("record").addEventListener("click", () => {
-    // teacher_hub にパラメータを引き継ぐ
-    window.location.href = `https://dondenden.github.io/hudarogu/src/student_matche${currentParams}`;
+    // 記録ページにパラメータを引き継ぐ
+    window.location.href = `https://dondenden.github.io/hudarogu/src/student_match_record.html${currentParams}`;
 });
 
 document.getElementById("watch").addEventListener("click", () => {
-    // student_hub にパラメータを引き継ぐ
-    window.location.href = `https://dondenden.github.io/hudarogu/src/student_hub${currentParams}`;
+    // 閲覧ページにパラメータを引き継ぐ
+    window.location.href = `https://dondenden.github.io/hudarogu/src/student_match_view.html${currentParams}`;
 });

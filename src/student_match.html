@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>試合結果記録</title>
-  <script type="module" src="js/stundet_match.js?v=202509051701"></script>
+  <script type="module" src="js/stundet_match.js?v=202509051705"></script>
 </head>
 <body>
   <h1>試合結果を記録</h1>
@@ -11,7 +11,7 @@
 
   <form id="matchForm">
     <label>対戦相手:
-      <select id="opponentSelect">
+      <select id="opponentSelect" required>
         <option value="">-- 対戦相手を選択 --</option>
       </select>
     </label><br>
@@ -23,6 +23,12 @@
     <label>試合日:
       <input type="date" id="matchDate" required>
     </label><br>
+
+    <fieldset>
+      <legend>勝敗</legend>
+      <label><input type="radio" name="result" value="勝ち" required> 勝ち</label>
+      <label><input type="radio" name="result" value="負け" required> 負け</label>
+    </fieldset><br>
 
     <button type="submit">保存</button>
   </form>

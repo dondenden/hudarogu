@@ -53,15 +53,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     const opponent = opponentSelect.value;
     const score = scoreInput.value;
-    const date = matchDateInput.value; // YYYY-MM-DD
+    const date = matchDateInput.value;
+    const result = matchForm.result.value; // ラジオボタンの値
 
-    if (!opponent || score === "" || !date) return;
+    if (!opponent || score === "" || !date || !result) return;
 
     try {
       await addDoc(collection(db, schoolName, studentName, "matches"), {
         opponent,
         score: Number(score),
-        date,                     // ← 日付を保存
+        date,
+        result,          // 勝敗を保存
         createdAt: serverTimestamp()
       });
       alert("試合結果を保存しました！");

@@ -78,19 +78,26 @@ async function loadMatches() {
       <td>${opponent}</td>
       <td>${totalGames}</td>
       <td>${(winCount/totalGames*100).toFixed(1)}%</td>
-      <td>${avgWinScore}</td>
-      <td>${avgLoseScore}</td>
+      <td class="win">${avgWinScore}</td>
+      <td class="lose">${avgLoseScore}</td>
     `;
     perOpponentStats.appendChild(tr);
   }
 
-  // 試合履歴（最新順）
+  // 試合履歴（テーブル形式）
   matchList.innerHTML = "";
   matches.forEach(m => {
     const dateStr = m.date || "日付不明";
-    const li = document.createElement("li");
-    li.textContent = `${dateStr} - 対戦相手: ${m.opponent}, 枚差: ${m.score}, 結果: ${m.result}`;
-    matchList.appendChild(li);
+    const resultClass = m.result === "勝ち" ? "win" : "lose";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${dateStr}</td>
+      <td>${m.opponent}</td>
+      <td>${m.score}</td>
+      <td class="${resultClass}">${m.result}</td>
+    `;
+    matchList.appendChild(tr);
   });
 }
 

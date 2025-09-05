@@ -1,85 +1,114 @@
-/* 全体のレイアウト */
+/* 全体レイアウト */
 body {
-  font-family: "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
-  background: #f9fafb;
-  color: #1e293b;
+  font-family: "Segoe UI", "Hiragino Sans", "Helvetica Neue", sans-serif;
+  background: #f7f9fc;
   margin: 0;
-  padding: 20px;
-  line-height: 1.6;
+  padding: 30px;
+  color: #333;
+  text-align: center;
 }
 
-/* 見出し */
-h1, h2 {
-  text-align: center;
+h1 {
+  font-size: 28px;
   margin-bottom: 20px;
-  color: #111827;
+  color: #222;
 }
 
-/* フォームやテーブルの中央揃え */
-form, table {
-  margin: 0 auto;
+h2 {
+  font-size: 22px;
+  margin: 30px 0 15px;
+  color: #444;
+  border-left: 5px solid #007bff;
+  padding-left: 10px;
+  text-align: left;
+  display: inline-block;
 }
 
-/* ボタン共通スタイル */
-button {
-  background: #1e293b;
-  color: #e5e7eb;
-  border: 1px solid #3b82f6;
-  padding: 10px 18px;
-  margin: 10px auto;   /* ← 横方向自動で中央揃え */
-  border-radius: 4px;
-  cursor: pointer;
-  display: block;      /* ← ボタンをブロック化して中央寄せ */
-  transition: background 0.2s, color 0.2s;
-  font-size: 16px;
-  min-width: 120px;    /* ボタンの幅を統一 */
-  text-align: center;
-}
-
-button:hover {
-  background: #3b82f6;
-  color: #fff;
-}
-
-button:disabled {
-  background: #475569;
-  border-color: #475569;
-  cursor: not-allowed;
-}
-
-/* 入力フォーム */
-input, select {
-  padding: 8px;
-  margin: 6px 0;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  width: 100%;
-  max-width: 300px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 14px;
-}
-
-/* テーブル */
+/* 表のスタイル */
 table {
   border-collapse: collapse;
+  margin: 0 auto 30px;
   width: 90%;
-  margin-top: 20px;
-  font-size: 14px;
+  max-width: 900px;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-table th, table td {
-  border: 1px solid #d1d5db;
-  padding: 8px 12px;
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px 15px;
   text-align: center;
+  font-size: 15px;
 }
 
-table th {
-  background: #f3f4f6;
+th {
+  background: #f0f2f5;
+  font-weight: bold;
+  color: #333;
+}
+
+tr:hover {
+  background: #f9fcff;
+}
+
+/* 勝ち負けの色分け */
+td.win {
+  color: #28a745;
+  font-weight: bold;
+}
+td.lose {
+  color: #dc3545;
   font-weight: bold;
 }
 
-table tr:nth-child(even) {
-  background: #f9fafb;
+/* ボタン */
+button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 25px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+/* データテーブル */
+.data-table {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.data-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.win {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.lose {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.center {
+  text-align: center;
+  margin-top: 20px;
 }

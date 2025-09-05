@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>試合結果表示</title>
-  <script type="module" src="js/student_record.js?v=202509060004"></script>
-  <link rel="stylesheet" href="css/style.css?v=1">
+  <script type="module" src="js/student_record.js?v=202509060033"></script>
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
   <h1 id="studentInfo"></h1>
@@ -13,7 +13,7 @@
   <p id="overallStats"></p>
 
   <h2>対戦相手別データ</h2>
-  <table border="1">
+  <table class="data-table">
     <thead>
       <tr>
         <th>対戦相手</th>
@@ -27,7 +27,20 @@
   </table>
 
   <h2>試合履歴（最新順）</h2>
-  <ul id="matchList"></ul>
-  <button id="backButton">戻る</button>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>対戦相手</th>
+        <th>枚差</th>
+        <th>結果</th>
+      </tr>
+    </thead>
+    <tbody id="matchList"></tbody>
+  </table>
+
+  <div class="center">
+    <button id="backButton">戻る</button>
+  </div>
 </body>
 </html>

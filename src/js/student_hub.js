@@ -21,6 +21,7 @@ const loginForm = document.getElementById("loginForm");
 const passwordWrapper = document.getElementById("passwordWrapper");
 const schoolPasswordInput = document.getElementById("schoolPassword");
 const togglePasswordBtn = document.getElementById("togglePassword");
+const loginButton = document.getElementById("loginButton");
 
 // 学校名ロード (schoolList コレクションから)
 async function loadSchools() {
@@ -45,19 +46,38 @@ togglePasswordBtn.addEventListener("click", () => {
 });
 
 // 学校選択時の処理
-schoolSelect.addEventListener("change", async () => {
-  const selectedSchool = schoolSelect.value;
+schoolSelect.addEventListener("change", () => {
   studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
   studentSelect.disabled = true;
+  loginButton.disabled = true;
   passwordWrapper.style.display = "none";
+  schoolPasswordInput.value = "";
 
-  if (!selectedSchool) return;
+  if (!schoolSelect.value) return;
 
-  // パスワード入力欄表示
+  // パスワード欄だけ表示
   passwordWrapper.style.display = "block";
+});
 
-  // 生徒名ロード
+// パスワード入力が終わったときの処理
+schoolPasswordInput.addEventListener("blur", async () => {
+  const selectedSchool = schoolSelect.value;
+  const enteredPassword = schoolPasswordInput.value.trim();
+
+  if (!selectedSchool || !enteredPassword) return;
+
+  // パスワードチェック
+  const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
+  const passwordSnap = await getDoc(passwordDocRef);
+
+  if (!passwordSnap.exists() || passwordSnap.data().password !== enteredPassword) {
+    alert("パスワードが間違っています");
+    return;
+  }
+
+  // ✅ パスワードが合ったら生徒名をロード
   const snap = await getDocs(collection(db, selectedSchool));
+  studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
   snap.forEach(docSnap => {
     if (docSnap.id === "passwordDoc") return; // passwordDocは除外
     const option = document.createElement("option");
@@ -67,33 +87,21 @@ schoolSelect.addEventListener("change", async () => {
   });
 
   studentSelect.disabled = false;
+  loginButton.disabled = false;
 });
 
 // フォーム送信
-loginForm.addEventListener("submit", async (e) => {
+loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const selectedSchool = schoolSelect.value;
   const selectedStudent = studentSelect.value;
-  const enteredPassword = schoolPasswordInput.value;
 
   if (!selectedSchool) {
     alert("学校を選択してください");
     return;
   }
-  if (!enteredPassword) {
-    alert("パスワードを入力してください");
-    return;
-  }
   if (!selectedStudent) {
     alert("生徒を選択してください");
-    return;
-  }
-
-  // パスワードチェック
-  const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
-  const passwordSnap = await getDoc(passwordDocRef);
-  if (!passwordSnap.exists() || passwordSnap.data().password !== enteredPassword) {
-    alert("パスワードが間違っています");
     return;
   }
 

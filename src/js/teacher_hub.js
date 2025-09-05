@@ -87,6 +87,12 @@ form.addEventListener("submit", async (e) => {
         password: schoolPassword,
         createdAt: serverTimestamp()
       });
+
+      // 🔹 schoolList にも登録
+      await setDoc(doc(db, "schoolList", schoolName), {
+        createdAt: serverTimestamp()
+      });
+
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
       // パスワードチェック
@@ -107,5 +113,5 @@ form.addEventListener("submit", async (e) => {
 
 // 戻るボタン処理
 backButton.addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/src/index';// トップページに戻る
+  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html'; // トップページに戻る
 });

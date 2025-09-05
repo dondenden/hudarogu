@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// 🔹 Firebase 設定
+// Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -22,9 +22,9 @@ const passwordWrapper = document.getElementById("passwordWrapper");
 const schoolPasswordInput = document.getElementById("schoolPassword");
 const togglePasswordBtn = document.getElementById("togglePassword");
 
-// 🔹 学校名ロード
+// 学校名ロード (schoolList コレクションから)
 async function loadSchools() {
-  const snap = await getDocs(collection(db, "schools")); // schools コレクションを作っている場合
+  const snap = await getDocs(collection(db, "schoolList"));
   snap.forEach(docSnap => {
     const option = document.createElement("option");
     option.value = docSnap.id;
@@ -33,7 +33,7 @@ async function loadSchools() {
   });
 }
 
-// 🔹 パスワード表示切替
+// パスワード表示切替
 togglePasswordBtn.addEventListener("click", () => {
   if (schoolPasswordInput.type === "password") {
     schoolPasswordInput.type = "text";
@@ -44,7 +44,7 @@ togglePasswordBtn.addEventListener("click", () => {
   }
 });
 
-// 🔹 学校選択時の処理
+// 学校選択時の処理
 schoolSelect.addEventListener("change", async () => {
   const selectedSchool = schoolSelect.value;
   studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
@@ -59,7 +59,7 @@ schoolSelect.addEventListener("change", async () => {
   // 生徒名ロード
   const snap = await getDocs(collection(db, selectedSchool));
   snap.forEach(docSnap => {
-    if (docSnap.id === "passwordDoc") return; // passwordDocは表示しない
+    if (docSnap.id === "passwordDoc") return; // passwordDocは除外
     const option = document.createElement("option");
     option.value = docSnap.id;
     option.textContent = docSnap.id;
@@ -69,7 +69,7 @@ schoolSelect.addEventListener("change", async () => {
   studentSelect.disabled = false;
 });
 
-// 🔹 フォーム送信
+// フォーム送信
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectedSchool = schoolSelect.value;
@@ -89,7 +89,7 @@ loginForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // 🔹 パスワードチェック
+  // パスワードチェック
   const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
   const passwordSnap = await getDoc(passwordDocRef);
   if (!passwordSnap.exists() || passwordSnap.data().password !== enteredPassword) {
@@ -99,7 +99,6 @@ loginForm.addEventListener("submit", async (e) => {
 
   // ログイン成功
   alert(`ログイン成功: 学校=${selectedSchool}, 生徒=${selectedStudent}`);
-  console.log(`ログイン: 学校=${selectedSchool}, 生徒=${selectedStudent}`);
 });
 
 loadSchools();

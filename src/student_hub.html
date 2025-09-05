@@ -3,35 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>生徒ログイン</title>
+  <script type="module" src="student_login.js"></script>
 </head>
 <body>
   <h1>生徒ログイン</h1>
 
   <form id="loginForm">
-    <label>学校名:
+    <label>学校を選択:
       <select id="schoolSelect">
-        <option value="">-- 選択してください --</option>
+        <option value="">-- 学校を選択してください --</option>
       </select>
     </label>
     <br><br>
 
     <div id="passwordWrapper" style="display:none;">
-      <label>パスワード:
-        <input type="password" id="schoolPassword" required>
+      <label>
+        パスワード:
+        <input type="password" id="schoolPassword">
         <button type="button" id="togglePassword">👁️</button>
       </label>
-      <br><br>
     </div>
+    <br>
 
-    <label>生徒名:
+    <label>生徒を選択:
       <select id="studentSelect" disabled>
-        <option value="">-- 学校を選んでください --</option>
+        <option value="">-- 生徒を選択してください --</option>
       </select>
     </label>
     <br><br>
+
     <button type="submit">ログイン</button>
   </form>
-
-  <script type="module" src="js/student_hub.js?v=202509051228"></script>
 </body>
 </html>

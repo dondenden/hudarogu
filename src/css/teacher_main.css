@@ -1,0 +1,142 @@
+/* 全体ベース */
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #ffffff);
+    color: #1f2937;
+    min-height: 100vh;
+}
+
+/* タイトル */
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.2rem;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 5px;
+}
+
+/* 名前登録フォーム */
+form#nameForm {
+    max-width: 400px;
+    margin: 0 auto 20px auto;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+form#nameForm label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+form#nameForm input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+form#nameForm button {
+    padding: 12px 0;
+    width: 100%;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+form#nameForm button:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+}
+
+form#nameForm button:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* 登録された名前一覧 */
+ul#nameList {
+    max-width: 400px;
+    margin: 0 auto 30px auto;
+    padding: 0;
+    list-style-type: none;
+}
+
+ul#nameList li {
+    background-color: rgba(241,245,249,0.7);
+    margin-bottom: 8px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* 戻るボタン */
+#backButton {
+    display: block;
+    max-width: 200px;
+    margin: 0 auto 30px auto;
+    padding: 10px 0;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    background-color: #6b7280;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+#backButton:hover {
+    background-color: #4b5563;
+}
+
+/* スマホ対応 */
+@media (max-width: 500px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1rem;
+    }
+
+    form#nameForm input[type="text"] {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+
+    form#nameForm button,
+    #backButton {
+        font-size: 0.9rem;
+        padding: 10px 0;
+    }
+
+    ul#nameList li {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+}

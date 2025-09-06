@@ -1,13 +1,14 @@
 /* 全体ベース */
-html,body {
+html, body {
     margin: 0;
-    padding: 20px;
+    padding: 0;
     font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
     background: linear-gradient(135deg, #f0f4f8, #ffffff);
     color: #1f2937;
     min-height: 100vh;
-    overflow: hidden; /* スクロール禁止 */
-    position: fixed;  /* 画面固定 */
+    overflow-y: auto; /* 縦スクロールを許可 */
+    overflow-x: hidden; /* 横スクロール禁止 */
+    box-sizing: border-box;
 }
 
 /* タイトル */
@@ -18,6 +19,7 @@ h1 {
     margin-bottom: 10px;
 }
 
+/* 生徒情報表示 */
 p#studentInfo {
     text-align: center;
     font-weight: 600;
@@ -32,8 +34,10 @@ form#matchForm {
     background-color: rgba(255,255,255,0.95);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-sizing: border-box;
 }
 
+/* ラベルと入力 */
 form label {
     display: block;
     margin-bottom: 15px;
@@ -48,8 +52,8 @@ select {
     margin-top: 5px;
     border-radius: 8px;
     border: 1px solid #cbd5e1;
-    box-sizing: border-box;
     font-size: 1rem;
+    box-sizing: border-box;
 }
 
 input:focus,
@@ -59,7 +63,7 @@ select:focus {
     box-shadow: 0 0 5px rgba(59,130,246,0.5);
 }
 
-/* 勝敗ラジオ */
+/* 勝敗ラジオボタン */
 fieldset {
     border: 1px solid #cbd5e1;
     padding: 10px 15px;
@@ -101,7 +105,7 @@ button:active {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-/* 戻るボタン個別色 */
+/* 戻るボタン */
 #backButton {
     background-color: #6b7280;
     margin-top: 10px;

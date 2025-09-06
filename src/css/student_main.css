@@ -1,14 +1,17 @@
 /* 全体ベース */
-body {
+html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 100%;
     font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
     background: linear-gradient(135deg, #f0f4f8, #ffffff);
     color: #1f2937;
-    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; /* 横・縦スクロール禁止 */
+    box-sizing: border-box;
 }
 
 /* コンテナ */
@@ -18,7 +21,9 @@ body {
     background-color: rgba(255,255,255,0.95);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    display: inline-block; /* タイトル幅に合わせる */
+    width: 100%;
+    max-width: 400px; /* スマホでも安定 */
+    box-sizing: border-box;
 }
 
 /* タイトル */
@@ -27,7 +32,7 @@ h1 {
     margin-bottom: 30px;
     font-weight: 700;
     color: #0f172a;
-    display: inline-block; /* 幅をテキストサイズに合わせる */
+    text-align: center;
 }
 
 /* ボタングループ */
@@ -41,7 +46,7 @@ h1 {
 
 /* ボタン */
 button {
-    padding: 12px 0; /* 左右は自動で100%幅に */
+    padding: 12px 0;
     font-size: 1rem;
     border: none;
     border-radius: 10px;
@@ -64,7 +69,7 @@ button:active {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-/* 戻るボタンを目立たせる */
+/* 戻るボタン */
 #backButton {
     background-color: #6b7280;
 }

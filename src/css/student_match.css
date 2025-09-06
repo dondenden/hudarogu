@@ -1,11 +1,13 @@
 /* 全体ベース */
-body {
+html,body {
     margin: 0;
     padding: 20px;
     font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
     background: linear-gradient(135deg, #f0f4f8, #ffffff);
     color: #1f2937;
     min-height: 100vh;
+    overflow: hidden; /* スクロール禁止 */
+    position: fixed;  /* 画面固定 */
 }
 
 /* タイトル */

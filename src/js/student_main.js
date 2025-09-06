@@ -13,7 +13,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // h1 に表示（改行対応済み）
   const h1 = document.getElementById("studentHeader");
-  h1.textContent = `${schoolName}の${studentName}さん\nのメインフォーム`;
+  h1.textContent = `${schoolName}の${studentName}さんの\nメインフォーム`;
 
   // ボタン取得
   const recordBtn = document.getElementById("record");

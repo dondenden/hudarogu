@@ -1,14 +1,17 @@
 /* ベース */
-body {
+html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 100%;
     font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
     background: linear-gradient(135deg, #e0f7fa, #ffffff);
     color: #1f2937;
-    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; /* スクロール禁止 */
+    position: fixed;  /* 画面固定 */
 }
 
 /* コンテナ */

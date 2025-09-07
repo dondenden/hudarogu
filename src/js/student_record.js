@@ -56,32 +56,11 @@ toggleHistoryBtn.addEventListener("click",()=>{
     }
 });
 
-// 円グラフ中央文字プラグイン（安全化）
-const centerTextPlugin = {
-    id: 'centerText',
-    beforeDraw(chart){
-        const centerText = chart.config.options.plugins?.centerText;
-        if(centerText && centerText.display){
-            const {ctx, chartArea:{width, height}} = chart;
-            const text = centerText.text || '';
-            ctx.save();
-            const fontSize = Math.min(width, height)/3; // 自動リサイズ
-            ctx.font = `bold ${fontSize}px sans-serif`;
-            ctx.fillStyle = centerText.color || '#1f2937';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, width/2, height/2);
-            ctx.restore();
-        }
-    }
-};
-Chart.register(centerTextPlugin);
-
 // データ読み込み
 async function loadMatches(){
     const matchesSnap = await getDocs(query(
         collection(db, schoolName, studentName, "matches"),
-        orderBy("createdAt", "desc")
+        orderBy("createdAt","desc")
     ));
 
     const matches = [];
@@ -97,7 +76,7 @@ async function loadMatches(){
     const winRatePercent = total ? ((wins/total)*100).toFixed(1) : 0;
     winRateText.textContent = `${winRatePercent}%`;
 
-    // 円グラフ描画
+    // 円グラフ描画（プラグインなし）
     new Chart(winRateChartCanvas, {
         type:'doughnut',
         data:{
@@ -108,10 +87,7 @@ async function loadMatches(){
             }]
         },
         options:{
-            plugins:{
-                legend:{display:false},
-                centerText:{display:true, text:`${winRatePercent}%`}
-            },
+            plugins:{legend:{display:false}},
             cutout:'70%'
         }
     });

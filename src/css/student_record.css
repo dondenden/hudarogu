@@ -1,75 +1,157 @@
-/* 全体ベース */
 body {
-    margin:0; padding:20px;
-    font-family:'Noto Sans JP','Yu Gothic',sans-serif;
-    background: linear-gradient(135deg,#f0f4f8,#ffffff);
-    color:#1f2937; line-height:1.5;
+    margin: 0;
+    padding: 15px;
+    font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
+    background: #f8fafc;
+    color: #1f2937;
+    line-height: 1.5;
 }
 
-h1 { text-align:center; font-size:2rem; font-weight:700; margin-bottom:20px; }
+/* タイトル */
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
 
-/* 全体カード */
+/* 全体データカード */
 .overall-card {
-    background:#fff;
-    border-radius:16px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.12);
-    padding:20px;
-    margin-bottom:25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
 }
-.overall-top, .overall-bottom { display:flex; gap:20px; margin-bottom:20px; }
+
+/* 上半分（試合数・勝率） */
+.upper {
+    display: flex;
+    gap: 15px;
+}
+
+/* 下半分（平均枚差） */
+.lower {
+    display: flex;
+}
+
+/* 小カード共通 */
 .small-card {
-    flex:1; background:#fefefe; border-radius:12px; padding:15px;
-    text-align:center; box-shadow:0 3px 8px rgba(0,0,0,0.08); position:relative;
-    display:flex; flex-direction:column; justify-content:center; align-items:center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    padding: 15px;
+    text-align: center;
 }
-.small-card:hover { transform: translateY(-2px); box-shadow:0 6px 12px rgba(0,0,0,0.15); }
 
-.small-card h3 { margin-bottom:10px; font-size:1rem; color:#0f172a; }
-.small-card p { margin:0; font-weight:700; font-size:2.5vw; /* カード幅に応じて拡大 */ }
+/* 試合数カード */
+.card-number {
+    font-size: 3em;
+    font-weight: 700;
+}
+.card-label {
+    margin-top: 5px;
+    font-weight: 600;
+}
 
-/* 勝率円グラフ中央の数字 */
+/* 勝率カード */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+}
+.chart-wrapper canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+}
 .winRateCenter {
-    position:absolute; top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    font-size:2.5vw; /* %で可変 */
-    font-weight:700; color:#2563eb;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    text-align: center;
+    line-height: 1;
 }
 
 /* 平均枚差カード */
-.avg-score-container { display:flex; gap:15px; flex:1; height:170px; }
-.avg-number { flex:1; font-size:2vw; }
-.daily-chart-card { flex:4; padding:10px; display:flex; flex-direction:column; }
-.scroll-container { overflow-x:auto; flex:1; }
+.avg-score-card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.avg-score-number {
+    font-size: 2em;
+    font-weight: 700;
+}
 
-/* 履歴ボタン */
-.center { text-align:center; margin:15px 0; }
-#toggleHistory, #backButton {
-    padding:12px 28px; font-size:1rem; border:none; border-radius:10px;
-    background-color:#3b82f6; color:white; font-weight:700; cursor:pointer;
+/* 日付ごとの線グラフを横スクロール可能に */
+.scrollable {
+    overflow-x: auto;
+}
+
+/* 履歴テーブル */
+.history-section button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #3b82f6;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 0.9rem;
+}
+.data-table th,
+.data-table td {
+    padding: 8px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+.data-table th {
+    background-color: #f1f5f9;
+    font-weight: 600;
+}
+.data-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+.win { color: #10b981; font-weight:600; }
+.lose { color: #ef4444; font-weight:600; }
+
+/* 戻るボタン */
+.center {
+    text-align: center;
+    margin: 25px 0;
+}
+#backButton {
+    padding: 10px 25px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
-#toggleHistory:hover, #backButton:hover { background-color:#2563eb; transform:translateY(-2px); }
-
-/* データテーブル */
-.data-table { width:100%; border-collapse:collapse; margin-bottom:20px; box-shadow:0 1px 8px rgba(0,0,0,0.08); background:#fff; border-radius:10px; overflow:hidden; font-size:0.9rem; }
-.data-table th, .data-table td { padding:8px 10px; text-align:center; border-bottom:1px solid #e5e7eb; }
-.data-table th { background:#f1f5f9; font-weight:600; }
-.data-table tbody tr:hover { background-color:#f9fafb; }
-.win { color:#10b981; font-weight:600; }
-.lose { color:#ef4444; font-weight:600; }
-
-/* 対戦相手グラフ */
-.charts-container { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin:20px 0; }
-.chart-card {
-    background:#fff; padding:15px; border-radius:12px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08); flex:1 1 280px; max-width:480px;
+#backButton:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
 }
-.chart-card h3 { text-align:center; margin-bottom:12px; font-size:1rem; font-weight:600; }
 
-@media(max-width:600px){
-    h1{font-size:1.6rem;}
-    .overall-top,.overall-bottom,.avg-score-container{flex-direction:column;}
-    .charts-container{flex-direction:column;}
-    .small-card p,.winRateCenter{font-size:4vw;}
+/* スマホ対応 */
+@media (max-width: 600px) {
+    h1 { font-size: 1.5rem; }
+    .upper { flex-direction: column; }
+    .lower { flex-direction: column; }
+    .card-number { font-size: 2.2em; }
+    .avg-score-number { font-size: 1.8em; }
 }

@@ -4,61 +4,60 @@
   <meta charset="UTF-8">
   <title>試合結果表示</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="src/js/student_record.js?v=09080127"></script>
-  <link rel="stylesheet" href="src/css/student_record.css?v=09080127">
+  <script type="module" src="src/js/student_record.js?v=09080134"></script>
+  <link rel="stylesheet" href="src/css/student_record.css?v=09080134">
 </head>
 <body>
   <h1 id="studentInfo"></h1>
 
-  <h2>全体データ</h2>
-  <div id="overallStats" class="stats-card">
-    <div class="small-cards">
-      <div class="small-card" id="totalMatches">試合数: 0</div>
-      <div class="small-card" id="winRate">勝率: 0%</div>
-      <div class="small-card" id="avgScore">平均枚差: 0</div>
+  <!-- 全体データカード -->
+  <div class="overall-card">
+    <div class="overall-top">
+      <div class="small-card" id="totalMatches">
+        <h3>試合数</h3>
+        <p>0</p>
+      </div>
+      <div class="small-card" id="winRateCard">
+        <h3>勝率</h3>
+        <canvas id="winRateChart" width="80" height="80"></canvas>
+      </div>
     </div>
-    <canvas id="overallChart" style="margin-top:10px;"></canvas>
+    <div class="overall-bottom">
+      <div class="small-card" id="avgScoreCard">
+        <h3>平均枚差</h3>
+        <p>0</p>
+      </div>
+      <div class="small-card" id="dailyAvgChartCard">
+        <h3>日付ごとの平均枚差</h3>
+        <canvas id="dailyAvgChart"></canvas>
+      </div>
+    </div>
   </div>
 
-  <h2>対戦相手別データ</h2>
-  <div class="data-table-wrapper">
+  <!-- 履歴ボタン -->
+  <div class="center">
+    <button id="toggleHistory">履歴を見る</button>
+  </div>
+
+  <!-- 試合履歴 -->
+  <div id="matchHistory" style="display:none;">
+    <h2>試合履歴（最新順）</h2>
     <table class="data-table">
       <thead>
         <tr>
+          <th>日付</th>
           <th>対戦相手</th>
-          <th>試合数</th>
-          <th>勝率</th>
-          <th>勝ち平均枚差</th>
-          <th>負け平均枚差</th>
+          <th>枚差</th>
+          <th>結果</th>
         </tr>
       </thead>
-      <tbody id="perOpponentStats"></tbody>
+      <tbody id="matchList"></tbody>
     </table>
   </div>
 
-  <h2>
-    試合履歴（最新順）
-    <button id="toggleMatchList" class="toggle-btn">表示/非表示</button>
-  </h2>
-  <div id="matchListWrapper">
-    <div class="data-table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>日付</th>
-            <th>対戦相手</th>
-            <th>枚差</th>
-            <th>結果</th>
-          </tr>
-        </thead>
-        <tbody id="matchList"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <h2>グラフ</h2>
+  <!-- グラフ -->
+  <h2>対戦相手別データ</h2>
   <div class="charts-container">
     <div class="chart-card">
       <h3>対戦相手別 勝率</h3>

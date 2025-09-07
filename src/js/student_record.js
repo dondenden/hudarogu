@@ -1,175 +1,150 @@
+// student_record.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Firebase 設定
 const firebaseConfig = {
-  apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
-  authDomain: "hudarogu-71a4f.firebaseapp.com",
-  projectId: "hudarogu-71a4f",
-  storageBucket: "hudarogu-71a4f.appspot.com",
-  messagingSenderId: "453627568918",
-  appId: "1:453627568918:web:85f634cfa2d0ca358e2637",
-  measurementId: "G-EVDBZ70E5C"
+  apiKey:"AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
+  authDomain:"hudarogu-71a4f.firebaseapp.com",
+  projectId:"hudarogu-71a4f",
+  storageBucket:"hudarogu-71a4f.appspot.com",
+  messagingSenderId:"453627568918",
+  appId:"1:453627568918:web:85f634cfa2d0ca358e2637",
+  measurementId:"G-EVDBZ70E5C"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// URLパラメータ取得
+// URLパラメータ
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 const studentName = params.get("student");
 const currentParams = window.location.search;
 
-if (!schoolName || !studentName) {
-  alert("ログイン情報がありません。");
-  window.location.href = 'index.html';
+if(!schoolName||!studentName){
+    alert("ログイン情報がありません。");
+    window.location.href='index.html';
 }
 
-// HTML要素参照
+// HTML要素
 const studentInfo = document.getElementById("studentInfo");
 const matchList = document.getElementById("matchList");
-const overallStats = document.getElementById("overallStats");
-const perOpponentStats = document.getElementById("perOpponentStats");
+const toggleHistoryBtn = document.getElementById("toggleHistory");
+const matchHistoryDiv = document.getElementById("matchHistory");
 const backButton = document.getElementById("backButton");
-const toggleBtn = document.getElementById("toggleMatchList");
-const matchListWrapper = document.getElementById("matchListWrapper");
 
-const totalMatchesEl = document.getElementById("totalMatches");
-const winRateEl = document.getElementById("winRate");
-const avgScoreEl = document.getElementById("avgScore");
-const overallChartEl = document.getElementById("overallChart");
+// 全体データカード
+const totalMatchesCard = document.getElementById("totalMatches");
+const winRateCard = document.getElementById("winRateCard");
+const avgScoreCard = document.getElementById("avgScoreCard");
+
+// グラフキャンバス
+const winRateChartCanvas = document.getElementById("winRateChart");
+const dailyAvgChartCanvas = document.getElementById("dailyAvgChart");
+const opponentChartCanvas = document.getElementById("opponentChart");
+const scoreChartCanvas = document.getElementById("scoreChart");
 
 studentInfo.textContent = `${schoolName}の${studentName}さん`;
 
-// 試合履歴表示/非表示
-toggleBtn.addEventListener("click", () => {
-  matchListWrapper.style.display = 
-    matchListWrapper.style.display === "none" ? "block" : "none";
+// 履歴表示切替
+toggleHistoryBtn.addEventListener("click",()=>{
+    if(matchHistoryDiv.style.display==="none"){
+        matchHistoryDiv.style.display="block";
+        toggleHistoryBtn.textContent="履歴を隠す";
+    }else{
+        matchHistoryDiv.style.display="none";
+        toggleHistoryBtn.textContent="履歴を見る";
+    }
 });
 
 // データ読み込み
-async function loadMatches() {
-  const matchesSnap = await getDocs(query(
-    collection(db, schoolName, studentName, "matches"),
-    orderBy("createdAt", "desc")
-  ));
+async function loadMatches(){
+    const matchesSnap = await getDocs(query(
+        collection(db,schoolName,studentName,"matches"),
+        orderBy("createdAt","desc")
+    ));
+    const matches=[];
+    matchesSnap.forEach(doc=>matches.push(doc.data()));
 
-  const matches = [];
-  matchesSnap.forEach(doc => matches.push(doc.data()));
+    const total = matches.length;
+    const wins = matches.filter(m=>m.result==="勝ち").length;
+    const avgScore = total?(matches.reduce((s,m)=>s+Number(m.score),0)/total).toFixed(1):0;
 
-  const total = matches.length;
-  const wins = matches.filter(m => m.result === "勝ち").length;
-  const avgScore = total ? (matches.reduce((sum,m)=>sum + Number(m.score),0)/total).toFixed(1) : 0;
+    // 全体カード更新
+    totalMatchesCard.querySelector("p").textContent=total;
+    avgScoreCard.querySelector("p").textContent=avgScore;
 
-  totalMatchesEl.textContent = `試合数: ${total}`;
-  winRateEl.textContent = `勝率: ${total ? (wins/total*100).toFixed(1) : 0}%`;
-  avgScoreEl.textContent = `平均枚差: ${avgScore}`;
+    // 円グラフ（勝率）
+    const winRatePercent = total?((wins/total)*100).toFixed(1):0;
+    new Chart(winRateChartCanvas,{
+        type:'doughnut',
+        data:{labels:['勝ち','負け'], datasets:[{data:[wins,total-wins], backgroundColor:['#10b981','#ef4444']}]},
+        options:{plugins:{legend:{display:false}}, cutout:'70%'}
+    });
 
-  // 対戦相手別集計
-  const opponentMap = {};
-  matches.forEach(m => {
-    if (!opponentMap[m.opponent]) opponentMap[m.opponent] = [];
-    opponentMap[m.opponent].push(m);
-  });
+    // 履歴テーブル
+    matchList.innerHTML="";
+    const dailyMap={};
+    matches.forEach(m=>{
+        // 日付ごとの集計
+        if(!dailyMap[m.date]) dailyMap[m.date]=[];
+        dailyMap[m.date].push(Number(m.score));
 
-  perOpponentStats.innerHTML = "";
-  for (const [opponent, games] of Object.entries(opponentMap)) {
-    const winGames = games.filter(g => g.result === "勝ち");
-    const loseGames = games.filter(g => g.result === "負け");
-    const winCount = winGames.length;
-    const totalGames = games.length;
-    const avgWinScore = winGames.length ? (winGames.reduce((sum,g)=>sum + Number(g.score),0)/winGames.length).toFixed(1) : "-";
-    const avgLoseScore = loseGames.length ? (loseGames.reduce((sum,g)=>sum + Number(g.score),0)/loseGames.length).toFixed(1) : "-";
+        // 履歴
+        const tr=document.createElement("tr");
+        const cls=m.result==='勝ち'?'win':'lose';
+        tr.innerHTML=`<td>${m.date||'日付不明'}</td><td>${m.opponent}</td><td>${m.score}</td><td class="${cls}">${m.result}</td>`;
+        matchList.appendChild(tr);
+    });
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${opponent}</td>
-      <td>${totalGames}</td>
-      <td>${(winCount/totalGames*100).toFixed(1)}%</td>
-      <td class="win">${avgWinScore}</td>
-      <td class="lose">${avgLoseScore}</td>
-    `;
-    perOpponentStats.appendChild(tr);
-  }
+    // 日付ごとの平均枚差
+    const dailyLabels=Object.keys(dailyMap).sort();
+    const dailyAvg= dailyLabels.map(d=> (dailyMap[d].reduce((s,v)=>s+v,0)/dailyMap[d].length).toFixed(1));
+    new Chart(dailyAvgChartCanvas,{
+        type:'line',
+        data:{labels:dailyLabels,datasets:[{label:'平均枚差',data:dailyAvg,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)',tension:0.3,fill:true}]},
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+    });
 
-  // 試合履歴
-  matchList.innerHTML = "";
-  const dateMap = {};
-  matches.forEach(m => {
-    const dateStr = m.date || "日付不明";
-    const resultClass = m.result === "勝ち" ? "win" : "lose";
+    // 対戦相手別
+    const opponentMap={};
+    matches.forEach(m=>{if(!opponentMap[m.opponent]) opponentMap[m.opponent]=[]; opponentMap[m.opponent].push(m);});
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${dateStr}</td>
-      <td>${m.opponent}</td>
-      <td>${m.score}</td>
-      <td class="${resultClass}">${m.result}</td>
-    `;
-    matchList.appendChild(tr);
-
-    if (!dateMap[dateStr]) dateMap[dateStr] = [];
-    dateMap[dateStr].push(Number(m.score));
-  });
-
-  const overallLabels = Object.keys(dateMap);
-  const overallScores = overallLabels.map(date => {
-    const values = dateMap[date];
-    return (values.reduce((sum,v)=>sum+v,0)/values.length).toFixed(1);
-  });
-
-  createCharts(matches, opponentMap, overallLabels, overallScores);
+    // グラフ作成
+    createOpponentCharts(opponentMap);
 }
 
-// Chart.js グラフ作成
-function createCharts(matches, opponentMap, overallLabels, overallScores) {
-  // 全体カード内のグラフ
-  new Chart(overallChartEl.getContext('2d'), {
-    type: 'line',
-    data: { labels: overallLabels, datasets: [{ label:'平均枚差', data:overallScores, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)', tension:0.3, fill:true, pointRadius:4, pointBackgroundColor:'#2563eb' }] },
-    options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
-  });
+// 対戦相手グラフ
+function createOpponentCharts(opponentMap){
+    const opponentLabels=Object.keys(opponentMap);
+    const opponentWinRates=opponentLabels.map(o=>{
+        const games=opponentMap[o];
+        const winCount=games.filter(g=>g.result==='勝ち').length;
+        return ((winCount/games.length)*100).toFixed(1);
+    });
+    new Chart(opponentChartCanvas,{
+        type:'bar',
+        data:{labels:opponentLabels,datasets:[{label:'勝率 (%)',data:opponentWinRates,backgroundColor:'#10b981'}]},
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}
+    });
 
-  // 対戦相手別勝率
-  const opponentLabels = Object.keys(opponentMap);
-  const opponentWinRates = opponentLabels.map(opponent => {
-    const games = opponentMap[opponent];
-    const winCount = games.filter(g => g.result==='勝ち').length;
-    return ((winCount / games.length)*100).toFixed(1);
-  });
-
-  const opponentCtx = document.getElementById('opponentChart').getContext('2d');
-  new Chart(opponentCtx, {
-    type:'bar',
-    data:{labels:opponentLabels, datasets:[{label:'勝率 (%)', data:opponentWinRates, backgroundColor:'#10b981'}]},
-    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, max:100}}}
-  });
-
-  const avgWinScores = opponentLabels.map(opponent => {
-    const winGames = opponentMap[opponent].filter(g => g.result==='勝ち');
-    return winGames.length ? (winGames.reduce((sum,g)=>sum+Number(g.score),0)/winGames.length).toFixed(1) : 0;
-  });
-  const avgLoseScores = opponentLabels.map(opponent => {
-    const loseGames = opponentMap[opponent].filter(g => g.result==='負け');
-    return loseGames.length ? (loseGames.reduce((sum,g)=>sum+Number(g.score),0)/loseGames.length).toFixed(1) : 0;
-  });
-
-  const scoreCtx = document.getElementById('scoreChart').getContext('2d');
-  new Chart(scoreCtx, {
-    type:'bar',
-    data:{labels:opponentLabels, datasets:[
-      {label:'勝ち平均枚差', data:avgWinScores, backgroundColor:'#3b82f6'},
-      {label:'負け平均枚差', data:avgLoseScores, backgroundColor:'#ef4444'}
-    ]},
-    options:{responsive:true, plugins:{legend:{position:'top'}}}
-  });
+    const avgWinScores=opponentLabels.map(o=>{
+        const wins=opponentMap[o].filter(g=>g.result==='勝ち');
+        return wins.length?(wins.reduce((s,g)=>s+Number(g.score),0)/wins.length).toFixed(1):0;
+    });
+    const avgLoseScores=opponentLabels.map(o=>{
+        const loses=opponentMap[o].filter(g=>g.result==='負け');
+        return loses.length?(loses.reduce((s,g)=>s+Number(g.score),0)/loses.length).toFixed(1):0;
+    });
+    new Chart(scoreChartCanvas,{
+        type:'bar',
+        data:{labels:opponentLabels,datasets:[{label:'勝ち平均枚差',data:avgWinScores,backgroundColor:'#3b82f6'},{label:'負け平均枚差',data:avgLoseScores,backgroundColor:'#ef4444'}]},
+        options:{responsive:true,plugins:{legend:{position:'top'}}}
+    });
 }
 
 // 戻るボタン
-backButton.addEventListener("click", () => {
-  window.location.href = `https://dondenden.github.io/hudarogu/student_main.html${currentParams}`;
-});
+backButton.addEventListener("click",()=>{ window.location.href=`https://dondenden.github.io/hudarogu/student_main.html${currentParams}` });
 
 // 初期ロード
 loadMatches();

@@ -1,177 +1,113 @@
-/* 全体ベース */
+/* student_record.css */
+
+/* 全体 */
 body {
-    margin: 0;
-    padding: 15px;
-    font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
-    background: #f8fafc;
-    color: #1f2937;
-    line-height: 1.5;
+    margin:0;
+    padding:15px;
+    font-family:'Noto Sans JP','Yu Gothic',sans-serif;
+    background:#f8fafc;
+    color:#1f2937;
+    line-height:1.5;
 }
 
-h1 {
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-}
-
-h2 {
-    font-size: 1.1rem;
-    margin-top: 20px;
-    margin-bottom: 8px;
-    color: #0f172a;
-    border-left: 5px solid #3b82f6;
-    padding-left: 8px;
-    display: flex;
-    align-items: center;
-}
+/* タイトル */
+h1 { text-align:center; font-size:1.8rem; font-weight:700; margin-bottom:15px; }
 
 /* 全体データカード */
-.stats-card {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 15px 20px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-  margin: 10px auto 20px;
-  max-width: 700px;
+.overall-card {
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    padding:15px;
+    margin-bottom:20px;
 }
 
-/* 小カード */
-.small-cards {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
+.overall-top, .overall-bottom {
+    display:flex;
+    gap:15px;
+    margin-bottom:15px;
 }
+
 .small-card {
-  background: #f1f5f9;
-  border-radius: 8px;
-  padding: 10px 15px;
-  min-width: 100px;
-  text-align: center;
-  font-weight: 600;
-  margin: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    flex:1;
+    background:#f1f5f9;
+    border-radius:10px;
+    padding:10px;
+    text-align:center;
+    box-shadow:0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* テーブル共通 */
+.small-card h3 {
+    margin-bottom:8px;
+    font-size:0.9rem;
+    color:#0f172a;
+}
+
+.small-card p {
+    font-size:1.2rem;
+    font-weight:600;
+    margin:0;
+}
+
+/* 履歴ボタン */
+.center { text-align:center; margin:15px 0; }
+#toggleHistory, #backButton {
+    padding:10px 25px;
+    font-size:0.95rem;
+    border:none;
+    border-radius:8px;
+    background-color:#3b82f6;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.2s ease;
+    margin:5px 0;
+}
+#toggleHistory:hover, #backButton:hover { background-color:#2563eb; transform:translateY(-2px); }
+
+/* データテーブル */
 .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-    background-color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    font-size: 0.9rem;
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:20px;
+    box-shadow:0 1px 6px rgba(0,0,0,0.08);
+    background-color:#fff;
+    border-radius:8px;
+    overflow:hidden;
+    font-size:0.9rem;
 }
+.data-table th, .data-table td { padding:8px 10px; text-align:center; border-bottom:1px solid #e5e7eb; }
+.data-table th { background:#f1f5f9; font-weight:600; }
+.data-table tbody tr:hover { background-color:#f9fafb; }
+.win { color:#10b981; font-weight:600; }
+.lose { color:#ef4444; font-weight:600; }
 
-.data-table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.data-table th,
-.data-table td {
-    padding: 8px 10px;
-    text-align: center;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.data-table th {
-    background-color: #f1f5f9;
-    font-weight: 600;
-}
-
-.data-table tbody tr:hover {
-    background-color: #f9fafb;
-}
-
-.win {
-    color: #10b981;
-    font-weight: 600;
-}
-.lose {
-    color: #ef4444;
-    font-weight: 600;
-}
-
+/* グラフカード */
 .charts-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-    margin: 20px 0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:center;
+    margin:20px 0;
 }
-
 .chart-card {
-    background-color: #ffffff;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    flex: 1 1 280px;
-    max-width: 450px;
+    background:#fff;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    flex:1 1 280px;
+    max-width:450px;
 }
-
 .chart-card h3 {
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-    font-weight: 600;
+    text-align:center;
+    margin-bottom:10px;
+    font-size:0.95rem;
+    font-weight:600;
 }
 
-.center {
-    text-align: center;
-    margin: 25px 0;
-}
-
-#backButton {
-    padding: 10px 25px;
-    font-size: 0.95rem;
-    border: none;
-    border-radius: 8px;
-    background-color: #3b82f6;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-#backButton:hover {
-    background-color: #2563eb;
-    transform: translateY(-2px);
-}
-
-.toggle-btn {
-  font-size: 0.8rem;
-  margin-left: 10px;
-  padding: 3px 8px;
-  border: none;
-  border-radius: 5px;
-  background: #e2e8f0;
-  cursor: pointer;
-}
-.toggle-btn:hover {
-  background: #cbd5e1;
-}
-
-@media (max-width: 600px) {
-    h1 {
-        font-size: 1.4rem;
-    }
-    h2 {
-        font-size: 1rem;
-    }
-    .data-table th,
-    .data-table td {
-        padding: 6px 5px;
-        font-size: 0.8rem;
-    }
-    #backButton {
-        width: 90%;
-        padding: 10px 0;
-    }
-    .charts-container, .small-cards {
-        flex-direction: column;
-        gap: 12px;
-    }
+/* スマホ対応 */
+@media(max-width:600px){
+    h1{font-size:1.4rem;}
+    .overall-top,.overall-bottom{flex-direction:column;}
+    .charts-container{flex-direction:column;}
 }

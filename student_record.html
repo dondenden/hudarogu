@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <title>試合結果表示</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="src/css/student_record.css?v=091010">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="src/js/student_record.js"></script>
-  <link rel="stylesheet" href="src/css/student_record.css?v=0923">
 </head>
 <body>
   <h1 id="studentInfo"></h1>
@@ -20,7 +19,8 @@
       </div>
       <div class="small-card" id="winRateCard">
         <h3>勝率</h3>
-        <canvas id="winRateChart"></canvas>
+        <canvas id="winRateChart" width="120" height="120"></canvas>
+        <div class="winRateCenter" id="winRateText">0%</div>
       </div>
     </div>
     <div class="overall-bottom">
@@ -76,5 +76,8 @@
   <div class="center">
     <button id="backButton">戻る</button>
   </div>
+
+  <!-- JSは最後に読み込む -->
+  <script type="module" src="src/js/student_record.js?v=09080227"></script>
 </body>
 </html>

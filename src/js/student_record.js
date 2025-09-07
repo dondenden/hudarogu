@@ -35,6 +35,11 @@ const backButton = document.getElementById("backButton");
 const toggleBtn = document.getElementById("toggleMatchList");
 const matchListWrapper = document.getElementById("matchListWrapper");
 
+const totalMatchesEl = document.getElementById("totalMatches");
+const winRateEl = document.getElementById("winRate");
+const avgScoreEl = document.getElementById("avgScore");
+const overallChartEl = document.getElementById("overallChart");
+
 studentInfo.textContent = `${schoolName}の${studentName}さん`;
 
 // 試合履歴表示/非表示
@@ -57,9 +62,9 @@ async function loadMatches() {
   const wins = matches.filter(m => m.result === "勝ち").length;
   const avgScore = total ? (matches.reduce((sum,m)=>sum + Number(m.score),0)/total).toFixed(1) : 0;
 
-  overallStats.textContent = total
-    ? `全体勝率: ${(wins / total * 100).toFixed(1)}% (${wins}/${total}), 平均枚差: ${avgScore}`
-    : "試合データがありません";
+  totalMatchesEl.textContent = `試合数: ${total}`;
+  winRateEl.textContent = `勝率: ${total ? (wins/total*100).toFixed(1) : 0}%`;
+  avgScoreEl.textContent = `平均枚差: ${avgScore}`;
 
   // 対戦相手別集計
   const opponentMap = {};
@@ -90,12 +95,11 @@ async function loadMatches() {
 
   // 試合履歴
   matchList.innerHTML = "";
-  const dateMap = {}; // 日付ごとの枚差
+  const dateMap = {};
   matches.forEach(m => {
     const dateStr = m.date || "日付不明";
     const resultClass = m.result === "勝ち" ? "win" : "lose";
 
-    // 試合履歴テーブル
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${dateStr}</td>
@@ -105,30 +109,29 @@ async function loadMatches() {
     `;
     matchList.appendChild(tr);
 
-    // 日付ごとの平均計算用
     if (!dateMap[dateStr]) dateMap[dateStr] = [];
     dateMap[dateStr].push(Number(m.score));
   });
 
-  // 日付ごとの平均枚差ラベルとデータ
-  const labels = Object.keys(dateMap);
-  const scores = labels.map(date => {
+  const overallLabels = Object.keys(dateMap);
+  const overallScores = overallLabels.map(date => {
     const values = dateMap[date];
     return (values.reduce((sum,v)=>sum+v,0)/values.length).toFixed(1);
   });
 
-  createCharts(matches, opponentMap, labels, scores);
+  createCharts(matches, opponentMap, overallLabels, overallScores);
 }
 
 // Chart.js グラフ作成
-function createCharts(matches, opponentMap, labels, scores) {
-  const matchCtx = document.getElementById('matchChart').getContext('2d');
-  new Chart(matchCtx, {
+function createCharts(matches, opponentMap, overallLabels, overallScores) {
+  // 全体カード内のグラフ
+  new Chart(overallChartEl.getContext('2d'), {
     type: 'line',
-    data: { labels, datasets: [{ label:'平均枚差', data:scores, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)', tension:0.3, fill:true, pointRadius:4, pointBackgroundColor:'#2563eb' }] },
+    data: { labels: overallLabels, datasets: [{ label:'平均枚差', data:overallScores, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)', tension:0.3, fill:true, pointRadius:4, pointBackgroundColor:'#2563eb' }] },
     options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
   });
 
+  // 対戦相手別勝率
   const opponentLabels = Object.keys(opponentMap);
   const opponentWinRates = opponentLabels.map(opponent => {
     const games = opponentMap[opponent];

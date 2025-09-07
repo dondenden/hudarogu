@@ -6,14 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="src/js/student_record.js?v=09080122"></script>
-  <link rel="stylesheet" href="src/css/student_record.css?v=09080123">
+  <script type="module" src="src/js/student_record.js?v=09080127"></script>
+  <link rel="stylesheet" href="src/css/student_record.css?v=09080127">
 </head>
 <body>
   <h1 id="studentInfo"></h1>
 
   <h2>全体データ</h2>
-  <div id="overallStats" class="stats-card"></div>
+  <div id="overallStats" class="stats-card">
+    <div class="small-cards">
+      <div class="small-card" id="totalMatches">試合数: 0</div>
+      <div class="small-card" id="winRate">勝率: 0%</div>
+      <div class="small-card" id="avgScore">平均枚差: 0</div>
+    </div>
+    <canvas id="overallChart" style="margin-top:10px;"></canvas>
+  </div>
 
   <h2>対戦相手別データ</h2>
   <div class="data-table-wrapper">
@@ -53,10 +60,6 @@
 
   <h2>グラフ</h2>
   <div class="charts-container">
-    <div class="chart-card">
-      <h3>日付ごとの平均枚差</h3>
-      <canvas id="matchChart"></canvas>
-    </div>
     <div class="chart-card">
       <h3>対戦相手別 勝率</h3>
       <canvas id="opponentChart"></canvas>

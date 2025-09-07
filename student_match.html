@@ -3,38 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <title>試合結果記録</title>
-  <!-- スマホで縮小されないようにする -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="module" src="src/js/stundet_match.js"></script>
-  <link rel="stylesheet" href="src/css/student_match.css?v=09061548">
+  <link rel="stylesheet" href="src/css/student_match.css?v=09072206>
 </head>
 <body>
-  <h1>試合結果を記録</h1>
-  <p id="studentInfo"></p>
+  <div class="container">
+    <h1>試合結果を記録</h1>
+    <p id="studentInfo"></p>
 
-  <form id="matchForm">
-    <label>対戦相手:
-      <select id="opponentSelect" required>
-        <option value="">-- 対戦相手を選択 --</option>
-      </select>
-    </label><br>
+    <form id="matchForm">
+      <label for="opponentSelect">対戦相手
+        <select id="opponentSelect" required>
+          <option value="">-- 対戦相手を選択 --</option>
+        </select>
+      </label>
 
-    <label>枚差:
-      <input type="number" id="score" min="0" required>
-    </label><br>
+      <label for="score">枚差
+        <input type="number" id="score" min="0" required>
+      </label>
 
-    <label>試合日:
-      <input type="date" id="matchDate" required>
-    </label><br>
+      <label for="matchDate">試合日
+        <input type="date" id="matchDate" required>
+      </label>
 
-    <fieldset>
-      <legend>勝敗</legend>
-      <label><input type="radio" name="result" value="勝ち" required> 勝ち</label>
-      <label><input type="radio" name="result" value="負け" required> 負け</label>
-    </fieldset><br>
+      <fieldset>
+        <legend>勝敗</legend>
+        <label><input type="radio" name="result" value="勝ち" required> 勝ち</label>
+        <label><input type="radio" name="result" value="負け" required> 負け</label>
+      </fieldset>
 
-    <button type="submit">保存</button>
-  </form>
-  <button id="backButton">戻る</button>
+      <button type="submit">保存</button>
+    </form>
+
+    <!-- 戻るは必ず type="button" にする（submitにならない） -->
+    <button id="backButton" type="button">戻る</button>
+  </div>
 </body>
 </html>

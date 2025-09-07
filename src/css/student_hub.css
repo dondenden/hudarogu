@@ -3,81 +3,72 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
     background: linear-gradient(135deg, #e0f2fe, #ffffff);
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* 横も縦もスクロール禁止 */
+    overflow: hidden; /* 縦横スクロール禁止 */
     box-sizing: border-box;
 }
 
-/* コンテナ幅は固定＋中央寄せ */
+/* コンテナ */
 .container {
     text-align: center;
-    padding: 40px 30px;
+    padding: 30px 20px;
     background-color: rgba(255,255,255,0.95);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px; /* スマホでも安定 */
+    width: 90%;
+    max-width: 400px;
     box-sizing: border-box;
 }
 
 /* タイトル */
 h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     color: #0f172a;
-    text-align: center;
 }
 
-/* フォーム内要素 */
+/* フォーム */
 form {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    width: 100%; /* フォーム幅をコンテナに合わせる */
+    width: 100%;
+    gap: 15px;
 }
 
-/* ラベルと入力 */
+/* ラベル */
 label {
     display: flex;
     flex-direction: column;
     font-size: 1rem;
-    margin-bottom: 20px;
     text-align: left;
+    gap: 6px;
 }
 
+/* 入力・選択 */
 select,
 input[type="password"] {
     width: 100%;
     padding: 10px 12px;
-    margin-top: 5px;
     font-size: 1rem;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     box-sizing: border-box;
 }
 
-/* パスワード切替ボタン */
+/* パスワード表示切替 */
 #togglePassword {
     padding: 6px 10px;
     font-size: 0.9rem;
     cursor: pointer;
-}
-
-/* パスワード欄をflexで横並びに */
-#passwordWrapper {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-#passwordWrapper input {
-    flex: 1;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 6px;
 }
 
 /* ボタン */
@@ -93,7 +84,6 @@ button {
     cursor: pointer;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-    margin-top: 10px;
 }
 
 button:hover {
@@ -103,7 +93,14 @@ button:hover {
 
 button:active {
     transform: translateY(1px);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* 戻るボタンだけ色違い */
+#backButton {
+    background-color: #64748b;
+}
+#backButton:hover {
+    background-color: #475569;
 }
 
 /* スマホ対応 */

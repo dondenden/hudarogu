@@ -109,4 +109,9 @@ loginForm.addEventListener("submit", (e) => {
   window.location.href = `student_main.html?school=${selectedSchool}&student=${selectedStudent}`;
 });
 
+// 戻る
+backBtn.addEventListener("click", () => {
+  window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
+});
+
 loadSchools();

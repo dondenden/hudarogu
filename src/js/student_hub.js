@@ -110,6 +110,7 @@ loginForm.addEventListener("submit", (e) => {
 });
 
 // 戻る
+const backBtn = document.getElementById("backButton");
 backBtn.addEventListener("click", () => {
   window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
 });

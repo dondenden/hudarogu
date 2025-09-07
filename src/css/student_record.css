@@ -24,14 +24,22 @@ h2 {
     color: #0f172a;
     border-left: 5px solid #3b82f6;
     padding-left: 8px;
+    display: flex;
+    align-items: center;
 }
 
-/* 全体データ表示 */
-#overallStats {
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    text-align: center;
+/* 全体データカード */
+.stats-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 15px 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  margin: 10px auto 20px;
+  text-align: center;
+  max-width: 600px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.6;
 }
 
 /* テーブル共通 */
@@ -124,6 +132,20 @@ h2 {
 #backButton:hover {
     background-color: #2563eb;
     transform: translateY(-2px);
+}
+
+/* 試合履歴表示/非表示ボタン */
+.toggle-btn {
+  font-size: 0.8rem;
+  margin-left: 10px;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 5px;
+  background: #e2e8f0;
+  cursor: pointer;
+}
+.toggle-btn:hover {
+  background: #cbd5e1;
 }
 
 /* スマホ対応 */

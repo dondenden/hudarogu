@@ -6,46 +6,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="src/js/student_record.js"></script>
-  <link rel="stylesheet" href="src/css/student_record.css?v=09072235">
+  <script type="module" src="src/js/student_record.js?v=09080122"></script>
+  <link rel="stylesheet" href="src/css/student_record.css?v=09080123">
 </head>
 <body>
   <h1 id="studentInfo"></h1>
 
   <h2>全体データ</h2>
-  <p id="overallStats"></p>
+  <div id="overallStats" class="stats-card"></div>
 
   <h2>対戦相手別データ</h2>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>対戦相手</th>
-        <th>試合数</th>
-        <th>勝率</th>
-        <th>勝ち平均枚差</th>
-        <th>負け平均枚差</th>
-      </tr>
-    </thead>
-    <tbody id="perOpponentStats"></tbody>
-  </table>
+  <div class="data-table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>対戦相手</th>
+          <th>試合数</th>
+          <th>勝率</th>
+          <th>勝ち平均枚差</th>
+          <th>負け平均枚差</th>
+        </tr>
+      </thead>
+      <tbody id="perOpponentStats"></tbody>
+    </table>
+  </div>
 
-  <h2>試合履歴（最新順）</h2>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>日付</th>
-        <th>対戦相手</th>
-        <th>枚差</th>
-        <th>結果</th>
-      </tr>
-    </thead>
-    <tbody id="matchList"></tbody>
-  </table>
+  <h2>
+    試合履歴（最新順）
+    <button id="toggleMatchList" class="toggle-btn">表示/非表示</button>
+  </h2>
+  <div id="matchListWrapper">
+    <div class="data-table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>対戦相手</th>
+            <th>枚差</th>
+            <th>結果</th>
+          </tr>
+        </thead>
+        <tbody id="matchList"></tbody>
+      </table>
+    </div>
+  </div>
 
   <h2>グラフ</h2>
   <div class="charts-container">
     <div class="chart-card">
-      <h3>日付ごとの枚差</h3>
+      <h3>日付ごとの平均枚差</h3>
       <canvas id="matchChart"></canvas>
     </div>
     <div class="chart-card">

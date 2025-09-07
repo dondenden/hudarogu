@@ -1,4 +1,3 @@
-// student_record.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -33,8 +32,16 @@ const matchList = document.getElementById("matchList");
 const overallStats = document.getElementById("overallStats");
 const perOpponentStats = document.getElementById("perOpponentStats");
 const backButton = document.getElementById("backButton");
+const toggleBtn = document.getElementById("toggleMatchList");
+const matchListWrapper = document.getElementById("matchListWrapper");
 
 studentInfo.textContent = `${schoolName}の${studentName}さん`;
+
+// 試合履歴表示/非表示
+toggleBtn.addEventListener("click", () => {
+  matchListWrapper.style.display = 
+    matchListWrapper.style.display === "none" ? "block" : "none";
+});
 
 // データ読み込み
 async function loadMatches() {
@@ -48,8 +55,6 @@ async function loadMatches() {
 
   const total = matches.length;
   const wins = matches.filter(m => m.result === "勝ち").length;
-
-  // 🔹 数値変換を追加
   const avgScore = total ? (matches.reduce((sum,m)=>sum + Number(m.score),0)/total).toFixed(1) : 0;
 
   overallStats.textContent = total
@@ -67,10 +72,8 @@ async function loadMatches() {
   for (const [opponent, games] of Object.entries(opponentMap)) {
     const winGames = games.filter(g => g.result === "勝ち");
     const loseGames = games.filter(g => g.result === "負け");
-
     const winCount = winGames.length;
     const totalGames = games.length;
-
     const avgWinScore = winGames.length ? (winGames.reduce((sum,g)=>sum + Number(g.score),0)/winGames.length).toFixed(1) : "-";
     const avgLoseScore = loseGames.length ? (loseGames.reduce((sum,g)=>sum + Number(g.score),0)/loseGames.length).toFixed(1) : "-";
 
@@ -87,12 +90,12 @@ async function loadMatches() {
 
   // 試合履歴
   matchList.innerHTML = "";
-  const labels = [];
-  const scores = [];
+  const dateMap = {}; // 日付ごとの枚差
   matches.forEach(m => {
     const dateStr = m.date || "日付不明";
     const resultClass = m.result === "勝ち" ? "win" : "lose";
 
+    // 試合履歴テーブル
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${dateStr}</td>
@@ -102,25 +105,30 @@ async function loadMatches() {
     `;
     matchList.appendChild(tr);
 
-    labels.push(dateStr);
-    scores.push(Number(m.score)); // 🔹 数値化
+    // 日付ごとの平均計算用
+    if (!dateMap[dateStr]) dateMap[dateStr] = [];
+    dateMap[dateStr].push(Number(m.score));
   });
 
-  // グラフ描画
+  // 日付ごとの平均枚差ラベルとデータ
+  const labels = Object.keys(dateMap);
+  const scores = labels.map(date => {
+    const values = dateMap[date];
+    return (values.reduce((sum,v)=>sum+v,0)/values.length).toFixed(1);
+  });
+
   createCharts(matches, opponentMap, labels, scores);
 }
 
 // Chart.js グラフ作成
 function createCharts(matches, opponentMap, labels, scores) {
-  // 日付ごとの枚差
   const matchCtx = document.getElementById('matchChart').getContext('2d');
   new Chart(matchCtx, {
     type: 'line',
-    data: { labels, datasets: [{ label:'枚差', data:scores, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)', tension:0.3, fill:true, pointRadius:4, pointBackgroundColor:'#2563eb' }] },
+    data: { labels, datasets: [{ label:'平均枚差', data:scores, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.2)', tension:0.3, fill:true, pointRadius:4, pointBackgroundColor:'#2563eb' }] },
     options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
   });
 
-  // 対戦相手別勝率
   const opponentLabels = Object.keys(opponentMap);
   const opponentWinRates = opponentLabels.map(opponent => {
     const games = opponentMap[opponent];
@@ -135,7 +143,6 @@ function createCharts(matches, opponentMap, labels, scores) {
     options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, max:100}}}
   });
 
-  // 対戦相手別 勝ち/負け平均枚差
   const avgWinScores = opponentLabels.map(opponent => {
     const winGames = opponentMap[opponent].filter(g => g.result==='勝ち');
     return winGames.length ? (winGames.reduce((sum,g)=>sum+Number(g.score),0)/winGames.length).toFixed(1) : 0;

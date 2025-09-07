@@ -1,121 +1,120 @@
+// student_record.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
-  authDomain: "hudarogu-71a4f.firebaseapp.com",
-  projectId: "hudarogu-71a4f",
-  storageBucket: "hudarogu-71a4f.appspot.com",
-  messagingSenderId: "453627568918",
-  appId: "1:453627568918:web:85f634cfa2d0ca358e2637",
-  measurementId: "G-EVDBZ70E5C"
+  apiKey:"AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
+  authDomain:"hudarogu-71a4f.firebaseapp.com",
+  projectId:"hudarogu-71a4f",
+  storageBucket:"hudarogu-71a4f.appspot.com",
+  messagingSenderId:"453627568918",
+  appId:"1:453627568918:web:85f634cfa2d0ca358e2637",
+  measurementId:"G-EVDBZ70E5C"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// URLパラメータ取得
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 const studentName = params.get("student");
 const currentParams = window.location.search;
+if(!schoolName||!studentName){ alert("ログイン情報がありません。"); window.location.href='index.html'; }
 
-if (!schoolName || !studentName) {
-  alert("ログイン情報がありません。");
-  window.location.href = 'index.html';
-}
+const studentInfo=document.getElementById("studentInfo");
+const matchList=document.getElementById("matchList");
+const toggleHistoryBtn=document.getElementById("toggleHistory");
+const matchHistoryDiv=document.getElementById("matchHistory");
+const backButton=document.getElementById("backButton");
 
-// HTML参照
-const studentInfo = document.getElementById("studentInfo");
-const matchList = document.getElementById("matchList");
-const matchListTable = document.getElementById("matchListTable");
-const toggleHistory = document.getElementById("toggleHistory");
-const backButton = document.getElementById("backButton");
+const totalMatchesCard=document.getElementById("totalMatches");
+const winRateCard=document.getElementById("winRateCard");
+const avgScoreCard=document.getElementById("avgScoreCard");
 
-// カード要素
-const matchCountEl = document.getElementById("matchCount");
-const winRateText = document.getElementById("winRateText");
-const avgScoreEl = document.getElementById("avgScore");
+const winRateChartCanvas=document.getElementById("winRateChart");
+const dailyAvgChartCanvas=document.getElementById("dailyAvgChart");
+const opponentChartCanvas=document.getElementById("opponentChart");
+const scoreChartCanvas=document.getElementById("scoreChart");
+const winRateText=document.getElementById("winRateText");
 
-// 初期表示
-studentInfo.textContent = `${schoolName}の${studentName}さん`;
-toggleHistory.addEventListener("click", () => {
-  matchListTable.style.display = matchListTable.style.display === 'none' ? 'table' : 'none';
+studentInfo.textContent=`${schoolName}の${studentName}さん`;
+
+toggleHistoryBtn.addEventListener("click",()=>{
+    if(matchHistoryDiv.style.display==="none"){ matchHistoryDiv.style.display="block"; toggleHistoryBtn.textContent="履歴を隠す"; }
+    else{ matchHistoryDiv.style.display="none"; toggleHistoryBtn.textContent="履歴を見る"; }
 });
 
-// 戻るボタン
-backButton.addEventListener("click", () => {
-  window.location.href = `https://dondenden.github.io/hudarogu/student_main.html${currentParams}`;
-});
+async function loadMatches(){
+    const matchesSnap=await getDocs(query(collection(db,schoolName,studentName,"matches"),orderBy("createdAt","desc")));
+    const matches=[]; matchesSnap.forEach(doc=>matches.push(doc.data()));
 
-// データ読み込み
-async function loadMatches() {
-  const matchesSnap = await getDocs(query(
-    collection(db, schoolName, studentName, "matches"),
-    orderBy("createdAt", "desc")
-  ));
+    const total=matches.length;
+    const wins=matches.filter(m=>m.result==="勝ち").length;
+    const avgScore=total?(matches.reduce((s,m)=>s+Number(m.score),0)/total).toFixed(1):0;
 
-  const matches = [];
-  matchesSnap.forEach(doc => matches.push(doc.data()));
+    totalMatchesCard.querySelector("p").textContent=total;
+    avgScoreCard.querySelector("p").textContent=avgScore;
 
-  const totalMatches = matches.length;
-  const totalWins = matches.filter(m=>m.result==='勝ち').length;
-  const avgScore = totalMatches ? (matches.reduce((sum,m)=>sum+Number(m.score),0)/totalMatches).toFixed(1) : 0;
+    const winRatePercent=total?((wins/total)*100).toFixed(1):0;
+    winRateText.textContent=`${winRatePercent}%`;
 
-  // カード表示
-  matchCountEl.textContent = totalMatches;
-  avgScoreEl.textContent = avgScore;
-  winRateText.textContent = totalMatches ? ((totalWins/totalMatches)*100).toFixed(1)+'%' : '0%';
+    new Chart(winRateChartCanvas,{
+        type:'doughnut',
+        data:{labels:['勝ち','負け'],datasets:[{data:[wins,total-wins], backgroundColor:['#10b981','#ef4444']}]},
+        options:{plugins:{legend:{display:false}}, cutout:'70%'}
+    });
 
-  adjustWinRateFont();
+    matchList.innerHTML="";
+    const dailyMap={};
+    matches.forEach(m=>{
+        if(!dailyMap[m.date]) dailyMap[m.date]=[];
+        dailyMap[m.date].push(Number(m.score));
 
-  // 試合履歴作成
-  matchList.innerHTML = '';
-  matches.forEach(m => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${m.date || '日付不明'}</td>
-      <td>${m.opponent}</td>
-      <td>${m.score}</td>
-      <td class="${m.result==='勝ち'?'win':'lose'}">${m.result}</td>
-    `;
-    matchList.appendChild(tr);
-  });
+        const tr=document.createElement("tr");
+        const cls=m.result==='勝ち'?'win':'lose';
+        tr.innerHTML=`<td>${m.date||'日付不明'}</td><td>${m.opponent}</td><td>${m.score}</td><td class="${cls}">${m.result}</td>`;
+        matchList.appendChild(tr);
+    });
 
-  // グラフ描画
-  createCharts(matches, totalWins, totalMatches, avgScore);
+    const dailyLabels=Object.keys(dailyMap).sort();
+    const dailyAvg=dailyLabels.map(d=> (dailyMap[d].reduce((s,v)=>s+v,0)/dailyMap[d].length).toFixed(1));
+    new Chart(dailyAvgChartCanvas,{
+        type:'line',
+        data:{labels:dailyLabels,datasets:[{label:'平均枚差',data:dailyAvg,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)',tension:0.3,fill:true}]},
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}, maintainAspectRatio:false}
+    });
+
+    const opponentMap={};
+    matches.forEach(m=>{if(!opponentMap[m.opponent]) opponentMap[m.opponent]=[]; opponentMap[m.opponent].push(m);});
+    createOpponentCharts(opponentMap);
 }
 
-// 勝率円グラフ + 平均枚差線グラフ
-function createCharts(matches, wins, total, avgScore){
-  // 勝率円グラフ
-  const winCtx = document.getElementById('winRateChart').getContext('2d');
-  new Chart(winCtx, {
-    type:'doughnut',
-    data:{
-      labels:['勝ち','負け'],
-      datasets:[{data:[wins,total-wins],backgroundColor:['#10b981','#e5e7eb'], borderWidth:0}]
-    },
-    options:{cutout:'70%', plugins:{legend:{display:false}}}
-  });
+function createOpponentCharts(opponentMap){
+    const opponentLabels=Object.keys(opponentMap);
+    const opponentWinRates=opponentLabels.map(o=>{
+        const games=opponentMap[o];
+        const winCount=games.filter(g=>g.result==='勝ち').length;
+        return ((winCount/games.length)*100).toFixed(1);
+    });
+    new Chart(opponentChartCanvas,{
+        type:'bar',
+        data:{labels:opponentLabels,datasets:[{label:'勝率 (%)',data:opponentWinRates,backgroundColor:'#10b981'}]},
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}
+    });
 
-  // 平均枚差線グラフ（横スクロール対応）
-  const labels = [...new Set(matches.map(m=>m.date))]; // 日付ごとの平均
-  const dateAvgScores = labels.map(date=>{
-    const ds = matches.filter(m=>m.date===date).map(m=>Number(m.score));
-    return ds.length ? (ds.reduce((a,b)=>a+b,0)/ds.length).toFixed(1) : 0;
-  });
-
-  const avgCtx = document.getElementById('avgScoreChart').getContext('2d');
-  new Chart(avgCtx,{type:'line',data:{labels,dateAvgScores:dateAvgScores,datasets:[{label:'平均枚差',data:dateAvgScores,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.2)',fill:true,tension:0.3,pointRadius:4,pointBackgroundColor:'#2563eb'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+    const avgWinScores=opponentLabels.map(o=>{
+        const wins=opponentMap[o].filter(g=>g.result==='勝ち');
+        return wins.length?(wins.reduce((s,g)=>s+Number(g.score),0)/wins.length).toFixed(1):0;
+    });
+    const avgLoseScores=opponentLabels.map(o=>{
+        const loses=opponentMap[o].filter(g=>g.result==='負け');
+        return loses.length?(loses.reduce((s,g)=>s+Number(g.score),0)/loses.length).toFixed(1):0;
+    });
+    new Chart(scoreChartCanvas,{
+        type:'bar',
+        data:{labels:opponentLabels,datasets:[{label:'勝ち平均枚差',data:avgWinScores,backgroundColor:'#3b82f6'},{label:'負け平均枚差',data:avgLoseScores,backgroundColor:'#ef4444'}]},
+        options:{responsive:true,plugins:{legend:{position:'top'}}}
+    });
 }
 
-function adjustWinRateFont(){
-  const wrapper = document.querySelector('#winRateCard .chart-wrapper');
-  const size = wrapper.offsetWidth;
-  winRateText.style.fontSize = (size*0.35)+'px';
-}
-
-// 初期ロード
+backButton.addEventListener("click",()=>{ window.location.href=`https://dondenden.github.io/hudarogu/student_main.html${currentParams}` });
 loadMatches();
-window.addEventListener('resize', adjustWinRateFont);

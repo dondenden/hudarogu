@@ -1,54 +1,62 @@
 /* 全体ベース */
 body {
     margin: 0;
-    padding: 20px;
+    padding: 15px;
     font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
     background: #f8fafc;
     color: #1f2937;
+    line-height: 1.5;
 }
 
 /* タイトル */
 h1 {
     text-align: center;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 /* セクションタイトル */
 h2 {
-    font-size: 1.2rem;
-    margin-top: 30px;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    margin-top: 20px;
+    margin-bottom: 8px;
     color: #0f172a;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 5px;
+    border-left: 5px solid #3b82f6;
+    padding-left: 8px;
 }
 
 /* 全体データ表示 */
 #overallStats {
     font-weight: 600;
     font-size: 1rem;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
-/* データテーブル共通 */
+/* テーブル共通 */
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
     background-color: #ffffff;
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
+    font-size: 0.9rem;
+}
+
+/* 横スクロール対応 */
+.data-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .data-table th,
 .data-table td {
-    padding: 10px 12px;
+    padding: 8px 10px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
-    font-size: 0.95rem;
 }
 
 .data-table th {
@@ -56,8 +64,9 @@ h2 {
     font-weight: 600;
 }
 
+/* ホバー効果 */
 .data-table tbody tr:hover {
-    background-color: #f1f5f9;
+    background-color: #f9fafb;
 }
 
 /* 勝敗の色分け */
@@ -65,81 +74,77 @@ h2 {
     color: #10b981;
     font-weight: 600;
 }
-
 .lose {
     color: #ef4444;
+    font-weight: 600;
+}
+
+/* グラフコンテナ */
+.charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.chart-card {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    flex: 1 1 280px;
+    max-width: 450px;
+}
+
+.chart-card h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
     font-weight: 600;
 }
 
 /* 戻るボタンセンター配置 */
 .center {
     text-align: center;
-    margin-bottom: 30px;
+    margin: 25px 0;
 }
 
 #backButton {
-    padding: 10px 30px;
-    font-size: 1rem;
+    padding: 10px 25px;
+    font-size: 0.95rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     background-color: #3b82f6;
     color: white;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
-
 #backButton:hover {
     background-color: #2563eb;
-}
-
-/* グラフカード */
-.charts-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 30px;
-}
-
-.chart-card {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    flex: 1 1 300px;
-    max-width: 500px;
-}
-
-.chart-card h3 {
-    text-align: center;
-    margin-bottom: 15px;
-    font-size: 1rem;
+    transform: translateY(-2px);
 }
 
 /* スマホ対応 */
 @media (max-width: 600px) {
     h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
-
     h2 {
         font-size: 1rem;
     }
-
     .data-table th,
     .data-table td {
-        padding: 8px 6px;
-        font-size: 0.85rem;
+        padding: 6px 5px;
+        font-size: 0.8rem;
     }
-
     #backButton {
-        width: 80%;
+        width: 90%;
         padding: 10px 0;
     }
-
     .charts-container {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
     }
 }

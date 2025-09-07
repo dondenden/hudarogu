@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         result,
         createdAt: serverTimestamp()
       });
-      alert("試合結果を保存しました！");
+      //alert("試合結果を保存しました！");
       matchForm.reset();
       window.location.href = `https://dondenden.github.io/hudarogu/student_main.html${currentParams}`;
     } catch (error) {

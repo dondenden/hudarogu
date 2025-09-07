@@ -1,113 +1,56 @@
 /* student_record.css */
 
-/* 全体 */
 body {
-    margin:0;
-    padding:15px;
+    margin:0; padding:15px;
     font-family:'Noto Sans JP','Yu Gothic',sans-serif;
-    background:#f8fafc;
-    color:#1f2937;
-    line-height:1.5;
+    background:#f8fafc; color:#1f2937; line-height:1.5;
 }
 
-/* タイトル */
 h1 { text-align:center; font-size:1.8rem; font-weight:700; margin-bottom:15px; }
 
-/* 全体データカード */
 .overall-card {
-    background:#fff;
-    border-radius:12px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.08);
-    padding:15px;
-    margin-bottom:20px;
+    background:#fff; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    padding:15px; margin-bottom:20px;
+}
+.overall-top, .overall-bottom { display:flex; gap:15px; margin-bottom:15px; }
+.small-card { flex:1; background:#f1f5f9; border-radius:10px; padding:10px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.05); position:relative;}
+.small-card h3 { margin-bottom:8px; font-size:0.9rem; color:#0f172a; }
+.small-card p { margin:0; font-weight:600; }
+
+.big-number p { font-size:2.2rem; }
+
+.winRateCenter {
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    font-size:1.2rem; font-weight:700;
 }
 
-.overall-top, .overall-bottom {
-    display:flex;
-    gap:15px;
-    margin-bottom:15px;
+.avg-score-container {
+    display:flex; gap:15px; flex:1; height:150px;
 }
-
-.small-card {
-    flex:1;
-    background:#f1f5f9;
-    border-radius:10px;
-    padding:10px;
-    text-align:center;
-    box-shadow:0 2px 5px rgba(0,0,0,0.05);
-}
-
-.small-card h3 {
-    margin-bottom:8px;
-    font-size:0.9rem;
-    color:#0f172a;
-}
-
-.small-card p {
-    font-size:1.2rem;
-    font-weight:600;
-    margin:0;
-}
+.avg-number { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+.daily-chart-card { flex:4; padding:10px; display:flex; flex-direction:column; }
+.scroll-container { overflow-x:auto; flex:1; }
 
 /* 履歴ボタン */
 .center { text-align:center; margin:15px 0; }
-#toggleHistory, #backButton {
-    padding:10px 25px;
-    font-size:0.95rem;
-    border:none;
-    border-radius:8px;
-    background-color:#3b82f6;
-    color:white;
-    font-weight:600;
-    cursor:pointer;
-    transition:all 0.2s ease;
-    margin:5px 0;
-}
+#toggleHistory, #backButton { padding:10px 25px; font-size:0.95rem; border:none; border-radius:8px; background-color:#3b82f6; color:white; font-weight:600; cursor:pointer; transition:all 0.2s ease; margin:5px 0; }
 #toggleHistory:hover, #backButton:hover { background-color:#2563eb; transform:translateY(-2px); }
 
 /* データテーブル */
-.data-table {
-    width:100%;
-    border-collapse:collapse;
-    margin-bottom:20px;
-    box-shadow:0 1px 6px rgba(0,0,0,0.08);
-    background-color:#fff;
-    border-radius:8px;
-    overflow:hidden;
-    font-size:0.9rem;
-}
+.data-table { width:100%; border-collapse:collapse; margin-bottom:20px; box-shadow:0 1px 6px rgba(0,0,0,0.08); background-color:#fff; border-radius:8px; overflow:hidden; font-size:0.9rem; }
 .data-table th, .data-table td { padding:8px 10px; text-align:center; border-bottom:1px solid #e5e7eb; }
 .data-table th { background:#f1f5f9; font-weight:600; }
 .data-table tbody tr:hover { background-color:#f9fafb; }
 .win { color:#10b981; font-weight:600; }
 .lose { color:#ef4444; font-weight:600; }
 
-/* グラフカード */
-.charts-container {
-    display:flex;
-    flex-wrap:wrap;
-    gap:15px;
-    justify-content:center;
-    margin:20px 0;
-}
-.chart-card {
-    background:#fff;
-    padding:15px;
-    border-radius:12px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.08);
-    flex:1 1 280px;
-    max-width:450px;
-}
-.chart-card h3 {
-    text-align:center;
-    margin-bottom:10px;
-    font-size:0.95rem;
-    font-weight:600;
-}
+.charts-container { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; margin:20px 0; }
+.chart-card { background:#fff; padding:15px; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.08); flex:1 1 280px; max-width:450px; }
+.chart-card h3 { text-align:center; margin-bottom:10px; font-size:0.95rem; font-weight:600; }
 
-/* スマホ対応 */
 @media(max-width:600px){
     h1{font-size:1.4rem;}
-    .overall-top,.overall-bottom{flex-direction:column;}
+    .overall-top,.overall-bottom,.avg-score-container{flex-direction:column;}
     .charts-container{flex-direction:column;}
 }

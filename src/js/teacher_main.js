@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // 🔹 Firebase 設定
 const firebaseConfig = {
@@ -28,33 +28,23 @@ const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
 
-// 🔹 生徒一覧表示（passwordDocを除外）
+// 🔹 生徒一覧表示
 async function loadNames() {
   list.innerHTML = "";
 
-  const schoolDocRef = doc(db, "schoolList", schoolName);
-  const schoolSnap = await getDoc(schoolDocRef);
+  const studentsColRef = collection(db, "schoolList", schoolName, "students");
+  const studentsSnap = await getDocs(studentsColRef);
 
-  if (!schoolSnap.exists() || !schoolSnap.data()) {
+  if (studentsSnap.empty) {
     const li = document.createElement("li");
     li.textContent = "まだ名前は登録されていません";
     list.appendChild(li);
     return;
   }
 
-  const studentsData = schoolSnap.data();
-  const studentNames = Object.keys(studentsData).filter(name => name !== "passwordDoc");
-
-  if (studentNames.length === 0) {
+  studentsSnap.forEach(docSnap => {
     const li = document.createElement("li");
-    li.textContent = "まだ名前は登録されていません";
-    list.appendChild(li);
-    return;
-  }
-
-  studentNames.forEach(name => {
-    const li = document.createElement("li");
-    li.textContent = name;
+    li.textContent = docSnap.id;
     list.appendChild(li);
   });
 }
@@ -72,9 +62,11 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // Firestore に保存（schoolList のドキュメント内フィールドとして保存）
-    const schoolDocRef = doc(db, "schoolList", schoolName);
-    await setDoc(schoolDocRef, { [studentName]: true }, { merge: true });
+    // Firestore に保存（schoolList > 学校名ドキュメント > students サブコレクション）
+    const studentDocRef = doc(db, "schoolList", schoolName, "students", studentName);
+    await setDoc(studentDocRef, {
+      createdAt: serverTimestamp()
+    });
 
     document.getElementById("name").value = "";
     await loadNames();

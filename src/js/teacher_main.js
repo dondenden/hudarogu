@@ -8,6 +8,9 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+// Firebase Authentication
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
 // 🔹 Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
@@ -21,6 +24,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // 🔹 URLパラメータから学校名取得
 const params = new URLSearchParams(window.location.search);
@@ -34,6 +38,16 @@ if (!schoolName) {
 const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
+
+// 🔹 ランダムパスワード生成関数
+function generatePassword(length = 8) {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
 
 // 🔹 名前一覧表示（passwordDocを除外）
 async function loadNames() {
@@ -50,7 +64,6 @@ async function loadNames() {
   snap.forEach(docSnap => {
     const docId = docSnap.id;
 
-    // 🔹 パスワード用ドキュメントは表示しない
     if (docId === "passwordDoc") return;
 
     const li = document.createElement("li");
@@ -60,29 +73,44 @@ async function loadNames() {
   });
 }
 
-// 🔹 名前登録フォーム
+// 🔹 名前登録フォーム（Firestore + Auth）
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const nameInput = document.getElementById("name");
-  const name = nameInput.value.trim();
-  if (!name) return;
+  const studentName = nameInput.value.trim();
+  if (!studentName) return;
 
-  // Firestoreに使えない文字のチェック
   const invalidChars = /[\/#?\[\]]/;
-  if (invalidChars.test(name)) {
+  if (invalidChars.test(studentName)) {
     alert("名前に使えない文字が含まれています。\n使用できない文字: / # ? [ ]");
     return;
   }
 
   try {
-    await setDoc(doc(db, schoolName, name), {
-      createdAt: serverTimestamp()
+    // 🔹 ランダムパスワード生成
+    const password = generatePassword(8);
+
+    // 🔹 メールアドレス自動生成
+    const email = `${studentName}@${schoolName}.local`;
+
+    // 🔹 Firebase Auth にアカウント作成
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = userCredential.user.uid;
+
+    // 🔹 Firestore にも保存
+    await setDoc(doc(db, schoolName, studentName), {
+      createdAt: serverTimestamp(),
+      uid: uid,
+      email: email
     });
+
+    alert(`生徒「${studentName}」を登録しました\n初期パスワード: ${password}`);
     nameInput.value = "";
     await loadNames();
+
   } catch (error) {
-    console.error("Error setting document: ", error);
-    alert("名前の登録中にエラーが発生しました。");
+    console.error("登録エラー:", error);
+    alert("登録に失敗しました: " + error.message);
   }
 });
 

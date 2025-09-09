@@ -28,6 +28,11 @@ const passwordWrapper = document.getElementById("passwordWrapper");
 const passwordLabel = document.getElementById("passwordLabel");
 const backButton = document.getElementById("backButton");
 
+const studentWrapper = document.getElementById("studentWrapper");
+const studentNameInput = document.getElementById("studentName");
+const studentPasswordWrapper = document.getElementById("studentPasswordWrapper");
+const studentPasswordLabel = document.getElementById("studentPasswordLabel");
+
 // 学校名入力後にパスワード欄表示
 schoolNameInput.addEventListener("blur", async () => {
   const schoolName = schoolNameInput.value.trim();
@@ -36,18 +41,16 @@ schoolNameInput.addEventListener("blur", async () => {
   const passwordDocRef = doc(db, schoolName, "passwordDoc");
   const passwordSnap = await getDoc(passwordDocRef);
 
-  // パスワード欄を表示
   passwordWrapper.style.display = "block";
+  studentWrapper.style.display = "block";
 
   if (!passwordSnap.exists()) {
-    // 新規登録用
     passwordLabel.innerHTML = `
       パスワード作成:
       <input type="password" id="schoolPassword" required>
       <button type="button" id="togglePassword">👁️</button>
     `;
   } else {
-    // 既存学校用
     passwordLabel.innerHTML = `
       パスワード入力:
       <input type="password" id="schoolPassword" required>
@@ -55,17 +58,44 @@ schoolNameInput.addEventListener("blur", async () => {
     `;
   }
 
-  // パスワード表示/非表示切替
   const toggleBtn = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("schoolPassword");
   toggleBtn.addEventListener("click", () => {
-    if (passwordInput.type === "password") {
-      passwordInput.type = "text";
-      toggleBtn.textContent = "🙈";
-    } else {
-      passwordInput.type = "password";
-      toggleBtn.textContent = "👁️";
-    }
+    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    toggleBtn.textContent = passwordInput.type === "password" ? "👁️" : "🙈";
+  });
+});
+
+// 生徒名入力後にチェック
+studentNameInput.addEventListener("blur", async () => {
+  const schoolName = schoolNameInput.value.trim();
+  const studentName = studentNameInput.value.trim();
+  if (!schoolName || !studentName) return;
+
+  const studentDocRef = doc(db, schoolName, studentName);
+  const studentSnap = await getDoc(studentDocRef);
+
+  studentPasswordWrapper.style.display = "block";
+
+  if (studentSnap.exists()) {
+    studentPasswordLabel.innerHTML = `
+      生徒パスワード入力:
+      <input type="password" id="studentPassword" required>
+      <button type="button" id="toggleStudentPassword">👁️</button>
+    `;
+  } else {
+    studentPasswordLabel.innerHTML = `
+      生徒パスワード作成:
+      <input type="password" id="studentPassword" required>
+      <button type="button" id="toggleStudentPassword">👁️</button>
+    `;
+  }
+
+  const toggleBtn = document.getElementById("toggleStudentPassword");
+  const passwordInput = document.getElementById("studentPassword");
+  toggleBtn.addEventListener("click", () => {
+    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    toggleBtn.textContent = passwordInput.type === "password" ? "👁️" : "🙈";
   });
 });
 
@@ -75,43 +105,59 @@ form.addEventListener("submit", async (e) => {
 
   const schoolName = schoolNameInput.value.trim();
   const schoolPassword = document.getElementById("schoolPassword")?.value.trim();
+  const studentName = studentNameInput.value.trim();
+  const studentPassword = document.getElementById("studentPassword")?.value.trim();
+
   if (!schoolName || !schoolPassword) return;
 
   try {
+    // 学校パスワード確認
     const passwordDocRef = doc(db, schoolName, "passwordDoc");
     const passwordSnap = await getDoc(passwordDocRef);
 
     if (!passwordSnap.exists()) {
-      // 新規登録
+      // 新規学校
       await setDoc(passwordDocRef, {
         password: schoolPassword,
         createdAt: serverTimestamp()
       });
-
-      // 🔹 schoolList にも登録
-      await setDoc(doc(db, "schoolList", schoolName), {
-        createdAt: serverTimestamp()
-      });
-
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
-      // パスワードチェック
-      const data = passwordSnap.data();
-      if (data.password !== schoolPassword) {
-        alert("パスワードが間違っています。");
+      if (passwordSnap.data().password !== schoolPassword) {
+        alert("学校パスワードが間違っています。");
         return;
       }
     }
 
-    // 成功したら名前登録画面へ遷移
+    // 生徒登録
+    if (studentName) {
+      const studentDocRef = doc(db, schoolName, studentName);
+      const studentSnap = await getDoc(studentDocRef);
+
+      if (!studentSnap.exists()) {
+        await setDoc(studentDocRef, {
+          password: studentPassword,
+          createdAt: serverTimestamp()
+        });
+        alert(`生徒「${studentName}」を新規登録しました！`);
+      } else {
+        if (studentSnap.data().password !== studentPassword) {
+          alert("生徒パスワードが間違っています。");
+          return;
+        }
+        alert(`生徒「${studentName}」でログインしました！`);
+      }
+    }
+
     window.location.href = `https://dondenden.github.io/hudarogu/teacher_main.html?school=${encodeURIComponent(schoolName)}`;
+
   } catch (error) {
     console.error("Error: ", error);
-    alert("エラーが発生しました。");
+    alert("エラーが発生しました: " + error.message);
   }
 });
 
-// 戻るボタン処理
+// 戻るボタン
 backButton.addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/index.html'; // トップページに戻る
+  window.location.href = 'index.html';
 });

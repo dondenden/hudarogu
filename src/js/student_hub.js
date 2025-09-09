@@ -26,19 +26,21 @@ const studentPasswordWrapper = document.getElementById("studentPasswordWrapper")
 const studentPasswordLabel = document.getElementById("studentPasswordLabel");
 const loginButton = document.getElementById("loginButton");
 
-// 🔹 学校リストロード
 async function loadSchools() {
-  console.log("学校リストを読み込み中...");
+  console.log("学校リストを読み込み開始");
   const schoolListRef = collection(db, "schoolList");
   const schoolListSnap = await getDocs(schoolListRef);
+  console.log("取得件数:", schoolListSnap.size);
+
+  if (schoolListSnap.empty) {
+    console.warn("schoolList コレクションにドキュメントが存在しません");
+  }
 
   schoolListSnap.forEach((docSnap) => {
-    const schoolName = docSnap.id; // ドキュメントIDが学校名
-    console.log("学校名:", schoolName);
-
+    console.log("ドキュメントID:", docSnap.id, "データ:", docSnap.data());
     const option = document.createElement("option");
-    option.value = schoolName;
-    option.textContent = schoolName;
+    option.value = docSnap.id;
+    option.textContent = docSnap.id;
     schoolSelect.appendChild(option);
   });
 }

@@ -1,8 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, setDoc, doc, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // 🔹 Firebase 設定
 const firebaseConfig = {
@@ -17,7 +14,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
 // URLパラメータから学校名取得
 const params = new URLSearchParams(window.location.search);
@@ -32,17 +28,7 @@ const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
 
-// 🔹 ランダムパスワード生成
-function generatePassword(length = 8) {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
-
-// 🔹 生徒一覧表示
+// 🔹 生徒一覧表示（passwordDocを除外）
 async function loadNames() {
   list.innerHTML = "";
   const snap = await getDocs(collection(db, schoolName));
@@ -56,10 +42,8 @@ async function loadNames() {
   snap.forEach(docSnap => {
     const docId = docSnap.id;
     if (docId === "passwordDoc") return;
-
-    const data = docSnap.data();
     const li = document.createElement("li");
-    li.innerHTML = `<strong>${docId}</strong> | UID: ${data.uid} | Pass: ${data.password}`;
+    li.textContent = docId;
     list.appendChild(li);
   });
 }
@@ -77,22 +61,11 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    const password = generatePassword(8);
-    const email = `${studentName}@${schoolName}.local`;
-
-    // Authに登録
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
-
-    // Firestoreに保存（パスワードも安全に同期）
+    // Firestore に保存（パスワードは扱わない旧仕様）
     await setDoc(doc(db, schoolName, studentName), {
-      createdAt: serverTimestamp(),
-      uid,
-      email,
-      password
+      createdAt: serverTimestamp()
     });
 
-    alert(`生徒「${studentName}」を登録しました\n初期パスワード: ${password}`);
     document.getElementById("name").value = "";
     await loadNames();
 

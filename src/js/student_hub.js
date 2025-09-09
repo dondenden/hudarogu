@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
 // Firebase 設定
 const firebaseConfig = {
@@ -14,6 +15,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 const schoolSelect = document.getElementById("schoolSelect");
 const studentSelect = document.getElementById("studentSelect");
@@ -23,7 +25,7 @@ const schoolPasswordInput = document.getElementById("schoolPassword");
 const togglePasswordBtn = document.getElementById("togglePassword");
 const loginButton = document.getElementById("loginButton");
 
-// 学校名ロード (schoolList コレクションから)
+// 学校ロード
 async function loadSchools() {
   const snap = await getDocs(collection(db, "schoolList"));
   snap.forEach(docSnap => {
@@ -54,19 +56,15 @@ schoolSelect.addEventListener("change", () => {
   schoolPasswordInput.value = "";
 
   if (!schoolSelect.value) return;
-
-  // パスワード欄だけ表示
   passwordWrapper.style.display = "block";
 });
 
-// パスワード入力が終わったときの処理
+// パスワード入力後、生徒一覧ロード
 schoolPasswordInput.addEventListener("blur", async () => {
   const selectedSchool = schoolSelect.value;
   const enteredPassword = schoolPasswordInput.value.trim();
-
   if (!selectedSchool || !enteredPassword) return;
 
-  // パスワードチェック
   const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
   const passwordSnap = await getDoc(passwordDocRef);
 
@@ -75,13 +73,13 @@ schoolPasswordInput.addEventListener("blur", async () => {
     return;
   }
 
-  // ✅ パスワードが合ったら生徒名をロード
+  // Firestore から生徒名＋メールをロード
   const snap = await getDocs(collection(db, selectedSchool));
   studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
   snap.forEach(docSnap => {
-    if (docSnap.id === "passwordDoc") return; // passwordDocは除外
+    if (docSnap.id === "passwordDoc") return;
     const option = document.createElement("option");
-    option.value = docSnap.id;
+    option.value = docSnap.id;  // doc ID は生徒名
     option.textContent = docSnap.id;
     studentSelect.appendChild(option);
   });
@@ -90,28 +88,34 @@ schoolPasswordInput.addEventListener("blur", async () => {
   loginButton.disabled = false;
 });
 
-// フォーム送信
-loginForm.addEventListener("submit", (e) => {
+// ログインフォーム送信
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectedSchool = schoolSelect.value;
   const selectedStudent = studentSelect.value;
+  const enteredPassword = schoolPasswordInput.value.trim();
 
-  if (!selectedSchool) {
-    alert("学校を選択してください");
-    return;
-  }
-  if (!selectedStudent) {
-    alert("生徒を選択してください");
-    return;
-  }
+  if (!selectedSchool || !selectedStudent || !enteredPassword) return;
 
-  // ログイン成功
-  window.location.href = `student_main.html?school=${selectedSchool}&student=${selectedStudent}`;
+  try {
+    // Firestore から生徒のメール取得
+    const studentDocRef = doc(db, selectedSchool, selectedStudent);
+    const studentSnap = await getDoc(studentDocRef);
+    if (!studentSnap.exists()) throw new Error("生徒情報が見つかりません");
+
+    const email = studentSnap.data().email; // 教員が登録時に保存しておく
+    await signInWithEmailAndPassword(auth, email, enteredPassword);
+
+    // ログイン成功
+    window.location.href = `student_main.html?school=${selectedSchool}&student=${selectedStudent}`;
+  } catch (error) {
+    console.error(error);
+    alert("ログイン失敗: メールまたはパスワードが間違っています");
+  }
 });
 
 // 戻る
-const backBtn = document.getElementById("backButton");
-backBtn.addEventListener("click", () => {
+document.getElementById("backButton").addEventListener("click", () => {
   window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
 });
 

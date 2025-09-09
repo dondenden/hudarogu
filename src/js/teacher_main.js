@@ -49,7 +49,6 @@ function generatePassword(length = 8) {
   return password;
 }
 
-// 🔹 名前一覧表示（passwordDocを除外）
 async function loadNames() {
   list.innerHTML = "";
   const snap = await getDocs(collection(db, schoolName));
@@ -63,12 +62,11 @@ async function loadNames() {
 
   snap.forEach(docSnap => {
     const docId = docSnap.id;
-
     if (docId === "passwordDoc") return;
 
+    const data = docSnap.data();
     const li = document.createElement("li");
-    li.textContent = docId;
-
+    li.innerHTML = `<strong>${docId}</strong> | UID: ${data.uid} | Pass: ${data.password}`;
     list.appendChild(li);
   });
 }
@@ -97,12 +95,13 @@ form.addEventListener("submit", async (e) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCredential.user.uid;
 
-    // 🔹 Firestore にも保存
     await setDoc(doc(db, schoolName, studentName), {
       createdAt: serverTimestamp(),
       uid: uid,
-      email: email
+      email: email,
+      password: password   // ここでパスワードも保存
     });
+
 
     alert(`生徒「${studentName}」を登録しました\n初期パスワード: ${password}`);
     nameInput.value = "";

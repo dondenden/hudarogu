@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>学校ログイン/登録</title>
-  <script type="module" src="src/js/teacher_hub.js?v=09100037"></script>
+  <script type="module" src="src/js/teacher_hub.js?v=09100043"></script>
   <link rel="stylesheet" href="src/css/teacher_hub.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -13,25 +13,13 @@
     <form id="schoolForm">
       <label>学校名: <input type="text" id="schoolName" required></label><br>
 
-      <!-- 学校パスワード -->
+      <!-- 最初は非表示 -->
       <div id="passwordWrapper" style="display:none;">
         <label id="passwordLabel">
           パスワード: 
           <input type="password" id="schoolPassword">
           <button type="button" id="togglePassword">👁️</button>
         </label>
-      </div>
-
-      <!-- 生徒情報 -->
-      <div id="studentWrapper" style="display:none; margin-top:1em;">
-        <label>生徒名: <input type="text" id="studentName"></label><br>
-        <div id="studentPasswordWrapper" style="display:none;">
-          <label id="studentPasswordLabel">
-            生徒パスワード:
-            <input type="password" id="studentPassword">
-            <button type="button" id="toggleStudentPassword">👁️</button>
-          </label>
-        </div>
       </div>
 
       <button type="submit">送信</button>

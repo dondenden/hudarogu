@@ -147,6 +147,23 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 });
 
+async function loadSchools() {
+  try {
+    const snap = await getDocs(collection(db, "schoolList"));
+    console.log("取得件数:", snap.size);
+    snap.forEach(docSnap => {
+      console.log("学校名:", docSnap.id, docSnap.data());
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = docSnap.id;
+      schoolSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("学校リスト取得エラー:", err);
+  }
+}
+
+
 // 戻る
 document.getElementById("backButton").addEventListener("click", () => {
   window.location.href = 'index.html';

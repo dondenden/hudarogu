@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <title>生徒ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script type="module" src="src/js/student_hub.js?v=09091750"></script>
-  <link rel="stylesheet" href="src/css/student_hub.css?v=09072200">
+  <script type="module" src="src/js/student_hub.js?=09100107"></script>
+  <link rel="stylesheet" href="src/css/student_hub.css">
 </head>
 <body>
   <div class="container">
@@ -19,21 +19,21 @@
       </label>
 
       <!-- 学校パスワード -->
-      <div id="passwordWrapper" style="display:none;">
-        <label> 学校パスワード: 
+      <div id="passwordWrapper" style="display:none; margin-top:10px;">
+        <label>学校パスワード:
           <input type="password" id="schoolPassword">
-          <button type="button" id="togglePassword">👁️</button>
+          <button type="button" id="toggleSchoolPassword">👁️</button>
         </label>
       </div>
 
-      <!-- 生徒ログイン欄（学校ログイン成功後に表示） -->
+      <!-- 生徒ログイン欄 -->
       <div id="studentWrapper" style="display:none; margin-top:15px;">
         <label>生徒名:
           <input type="text" id="studentName" placeholder="名前を入力してください">
         </label>
         <div id="studentPasswordWrapper" style="display:none; margin-top:10px;">
           <label id="studentPasswordLabel">
-            <!-- JSで「パスワード入力」か「パスワード作成」に切り替える -->
+            <!-- JSで切り替え -->
           </label>
         </div>
       </div>

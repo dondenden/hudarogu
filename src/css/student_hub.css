@@ -9,7 +9,8 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow-y: auto;  /* ← 自動縦スクロールを許可 */
+    overflow-x: hidden; /* 横スクロールは常に禁止 */
     box-sizing: border-box;
 }
 

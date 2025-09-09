@@ -4,29 +4,30 @@
   <meta charset="UTF-8">
   <title>生徒ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script type="module" src="src/js/student_hub.js?v=09091658"></script>
+  <script type="module" src="src/js/student_hub.js?v=09091714"></script>
   <link rel="stylesheet" href="src/css/student_hub.css?v=09072200">
 </head>
 <body>
   <div class="container">
     <h1>生徒ログイン</h1>
     <form id="loginForm">
+      <!-- 学校選択 -->
       <label>学校を選択:
         <select id="schoolSelect">
           <option value="">-- 学校を選択してください --</option>
         </select>
       </label>
 
+      <!-- パスワード -->
       <div id="passwordWrapper" style="display:none;">
         <label> パスワード: <input type="password" id="schoolPassword">
           <button type="button" id="togglePassword">👁️</button>
         </label>
       </div>
 
-      <label>生徒を選択:
-        <select id="studentSelect" disabled>
-          <option value="">-- 生徒を選択してください --</option>
-        </select>
+      <!-- 生徒名入力 -->
+      <label>生徒名:
+        <input type="text" id="studentName" placeholder="名前を入力してください">
       </label>
 
       <button id="loginButton" type="submit" disabled>ログイン</button>

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // 🔹 Firebase 設定
 const firebaseConfig = {
@@ -15,14 +15,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔹 DOM 取得
+// 🔹 DOM取得
 const schoolSelect = document.getElementById("schoolSelect");
-const studentSelect = document.getElementById("studentSelect");
 const loginForm = document.getElementById("loginForm");
 const passwordWrapper = document.getElementById("passwordWrapper");
 const schoolPasswordInput = document.getElementById("schoolPassword");
 const togglePasswordBtn = document.getElementById("togglePassword");
 const loginButton = document.getElementById("loginButton");
+const studentNameInput = document.getElementById("studentName");
 
 // 🔹 学校リストロード
 async function loadSchools() {
@@ -48,8 +48,6 @@ togglePasswordBtn.addEventListener("click", () => {
 
 // 🔹 学校選択
 schoolSelect.addEventListener("change", () => {
-  studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
-  studentSelect.disabled = true;
   loginButton.disabled = true;
   passwordWrapper.style.display = "none";
   schoolPasswordInput.value = "";
@@ -70,33 +68,27 @@ schoolPasswordInput.addEventListener("blur", async () => {
     return;
   }
 
-  // ✅ 生徒一覧ロード
-  const snap = await getDocs(collection(db, selectedSchool));
-  studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
-  snap.forEach(docSnap => {
-    if (docSnap.id === "passwordDoc") return;
-    const option = document.createElement("option");
-    option.value = docSnap.id;
-    option.textContent = docSnap.id;
-    studentSelect.appendChild(option);
-  });
-  studentSelect.disabled = false;
+  // ✅ ログインボタン有効化（生徒は自分で入力）
   loginButton.disabled = false;
 });
 
-// 🔹 ログイン処理（Firestore 上の平文パスワードを使用）
+// 🔹 ログイン処理（生徒作成）
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectedSchool = schoolSelect.value;
-  const selectedStudent = studentSelect.value;
+  const studentName = studentNameInput.value.trim();
 
-  if (!selectedSchool || !selectedStudent) {
-    alert("学校と生徒を選択してください");
+  if (!selectedSchool || !studentName) {
+    alert("学校と名前を入力してください");
     return;
   }
 
-  // ここでは学生のパスワードは使わず、選択された生徒で直接ログイン扱い
-  window.location.href = `student_main.html?school=${encodeURIComponent(selectedSchool)}&student=${encodeURIComponent(selectedStudent)}`;
+  // 🔹 Firebaseに生徒名を保存
+  const studentsRef = doc(db, selectedSchool, "students");
+  await setDoc(studentsRef, { [studentName]: true }, { merge: true });
+
+  // ✅ ログイン扱いで次ページへ
+  window.location.href = `student_main.html?school=${encodeURIComponent(selectedSchool)}&student=${encodeURIComponent(studentName)}`;
 });
 
 // 🔹 戻る

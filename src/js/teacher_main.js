@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, getDocs, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // 🔹 Firebase 設定
 const firebaseConfig = {
@@ -31,19 +31,30 @@ const backButton = document.getElementById("backButton");
 // 🔹 生徒一覧表示（passwordDocを除外）
 async function loadNames() {
   list.innerHTML = "";
-  const snap = await getDocs(collection(db, schoolName));
-  if (snap.empty) {
+
+  const schoolDocRef = doc(db, "schoolList", schoolName);
+  const schoolSnap = await getDoc(schoolDocRef);
+
+  if (!schoolSnap.exists() || !schoolSnap.data()) {
     const li = document.createElement("li");
     li.textContent = "まだ名前は登録されていません";
     list.appendChild(li);
     return;
   }
 
-  snap.forEach(docSnap => {
-    const docId = docSnap.id;
-    if (docId === "passwordDoc") return;
+  const studentsData = schoolSnap.data();
+  const studentNames = Object.keys(studentsData).filter(name => name !== "passwordDoc");
+
+  if (studentNames.length === 0) {
     const li = document.createElement("li");
-    li.textContent = docId;
+    li.textContent = "まだ名前は登録されていません";
+    list.appendChild(li);
+    return;
+  }
+
+  studentNames.forEach(name => {
+    const li = document.createElement("li");
+    li.textContent = name;
     list.appendChild(li);
   });
 }
@@ -61,10 +72,9 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // Firestore に保存（パスワードは扱わない旧仕様）
-    await setDoc(doc(db, schoolName, studentName), {
-      createdAt: serverTimestamp()
-    });
+    // Firestore に保存（schoolList のドキュメント内フィールドとして保存）
+    const schoolDocRef = doc(db, "schoolList", schoolName);
+    await setDoc(schoolDocRef, { [studentName]: true }, { merge: true });
 
     document.getElementById("name").value = "";
     await loadNames();

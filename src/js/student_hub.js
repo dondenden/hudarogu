@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-// Firebase 設定
+// 🔹 Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -17,6 +17,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// 🔹 DOM 取得
 const schoolSelect = document.getElementById("schoolSelect");
 const studentSelect = document.getElementById("studentSelect");
 const loginForm = document.getElementById("loginForm");
@@ -25,7 +26,44 @@ const schoolPasswordInput = document.getElementById("schoolPassword");
 const togglePasswordBtn = document.getElementById("togglePassword");
 const loginButton = document.getElementById("loginButton");
 
-// 学校ロード
+// 🔹 生徒パスワード欄作成
+let studentPasswordInput;
+let studentPasswordWrapper;
+
+function createStudentPasswordField() {
+  studentPasswordWrapper = document.createElement("div");
+  studentPasswordWrapper.style.display = "none";
+  studentPasswordWrapper.id = "studentPasswordWrapper";
+
+  const label = document.createElement("label");
+  label.textContent = "生徒パスワード: ";
+
+  studentPasswordInput = document.createElement("input");
+  studentPasswordInput.type = "password";
+  studentPasswordInput.id = "studentPassword";
+
+  const toggleBtn = document.createElement("button");
+  toggleBtn.type = "button";
+  toggleBtn.textContent = "👁️";
+  toggleBtn.addEventListener("click", () => {
+    if (studentPasswordInput.type === "password") {
+      studentPasswordInput.type = "text";
+      toggleBtn.textContent = "🙈";
+    } else {
+      studentPasswordInput.type = "password";
+      toggleBtn.textContent = "👁️";
+    }
+  });
+
+  label.appendChild(studentPasswordInput);
+  label.appendChild(toggleBtn);
+  studentPasswordWrapper.appendChild(label);
+  loginForm.insertBefore(studentPasswordWrapper, loginButton);
+}
+
+createStudentPasswordField();
+
+// 🔹 学校リストロード
 async function loadSchools() {
   const snap = await getDocs(collection(db, "schoolList"));
   snap.forEach(docSnap => {
@@ -36,7 +74,7 @@ async function loadSchools() {
   });
 }
 
-// パスワード表示切替
+// 🔹 学校パスワード表示切替
 togglePasswordBtn.addEventListener("click", () => {
   if (schoolPasswordInput.type === "password") {
     schoolPasswordInput.type = "text";
@@ -47,19 +85,19 @@ togglePasswordBtn.addEventListener("click", () => {
   }
 });
 
-// 学校選択時の処理
+// 🔹 学校選択
 schoolSelect.addEventListener("change", () => {
   studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
   studentSelect.disabled = true;
   loginButton.disabled = true;
   passwordWrapper.style.display = "none";
+  studentPasswordWrapper.style.display = "none";
   schoolPasswordInput.value = "";
-
   if (!schoolSelect.value) return;
   passwordWrapper.style.display = "block";
 });
 
-// パスワード入力後、生徒一覧ロード
+// 🔹 学校パスワード確認
 schoolPasswordInput.addEventListener("blur", async () => {
   const selectedSchool = schoolSelect.value;
   const enteredPassword = schoolPasswordInput.value.trim();
@@ -67,56 +105,54 @@ schoolPasswordInput.addEventListener("blur", async () => {
 
   const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
   const passwordSnap = await getDoc(passwordDocRef);
-
   if (!passwordSnap.exists() || passwordSnap.data().password !== enteredPassword) {
-    alert("パスワードが間違っています");
+    alert("学校パスワードが間違っています");
     return;
   }
 
-  // Firestore から生徒名＋メールをロード
+  // ✅ 生徒一覧ロード
   const snap = await getDocs(collection(db, selectedSchool));
   studentSelect.innerHTML = '<option value="">-- 生徒を選択してください --</option>';
   snap.forEach(docSnap => {
     if (docSnap.id === "passwordDoc") return;
     const option = document.createElement("option");
-    option.value = docSnap.id;  // doc ID は生徒名
+    option.value = docSnap.id;
     option.textContent = docSnap.id;
     studentSelect.appendChild(option);
   });
-
   studentSelect.disabled = false;
-  loginButton.disabled = false;
+  studentPasswordWrapper.style.display = "block";
 });
 
-// ログインフォーム送信
+// 🔹 ログイン処理
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectedSchool = schoolSelect.value;
   const selectedStudent = studentSelect.value;
-  const enteredPassword = schoolPasswordInput.value.trim();
+  const enteredStudentPassword = studentPasswordInput.value.trim();
 
-  if (!selectedSchool || !selectedStudent || !enteredPassword) return;
+  if (!selectedSchool || !selectedStudent || !enteredStudentPassword) {
+    alert("すべて入力してください");
+    return;
+  }
 
   try {
-    // Firestore から生徒のメール取得
-    const studentDocRef = doc(db, selectedSchool, selectedStudent);
-    const studentSnap = await getDoc(studentDocRef);
-    if (!studentSnap.exists()) throw new Error("生徒情報が見つかりません");
+    const studentSnap = await getDoc(doc(db, selectedSchool, selectedStudent));
+    const email = studentSnap.data().email;
 
-    const email = studentSnap.data().email; // 教員が登録時に保存しておく
-    await signInWithEmailAndPassword(auth, email, enteredPassword);
+    await signInWithEmailAndPassword(auth, email, enteredStudentPassword);
 
-    // ログイン成功
     window.location.href = `student_main.html?school=${selectedSchool}&student=${selectedStudent}`;
   } catch (error) {
     console.error(error);
-    alert("ログイン失敗: メールまたはパスワードが間違っています");
+    alert("生徒パスワードが間違っています");
   }
 });
 
-// 戻る
+// 🔹 戻る
 document.getElementById("backButton").addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
+  window.location.href = 'index.html';
 });
 
+// 初期ロード
 loadSchools();

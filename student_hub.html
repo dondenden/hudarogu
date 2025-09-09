@@ -5,8 +5,8 @@
   <title>生徒ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script type="module" src="src/js/student_hub.js?v=09091546"></script>
   <link rel="stylesheet" href="src/css/student_hub.css?v=09072200">
+  <script type="module" src="src/js/student_hub.js?v=09091546"></script>
 </head>
 <body>
   <div class="container">
@@ -21,7 +21,7 @@
 
       <div id="passwordWrapper" style="display:none;">
         <label>
-          パスワード:
+          学校パスワード:
           <input type="password" id="schoolPassword">
           <button type="button" id="togglePassword">👁️</button>
         </label>
@@ -34,7 +34,6 @@
       </label>
 
       <button id="loginButton" type="submit" disabled>ログイン</button>
-      <!-- ✅ 戻るは type="button" に修正 -->
       <button id="backButton" type="button">戻る</button>
     </form>
   </div>

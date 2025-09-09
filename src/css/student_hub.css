@@ -9,7 +9,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* 縦横スクロール禁止 */
+    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -61,14 +61,16 @@ input[type="password"] {
     box-sizing: border-box;
 }
 
-/* パスワード表示切替 */
-#togglePassword {
+/* パスワード表示切替ボタン */
+#togglePassword,
+.togglePasswordBtn {
     padding: 6px 10px;
     font-size: 0.9rem;
     cursor: pointer;
     border: none;
     background: #f1f5f9;
     border-radius: 6px;
+    margin-top: 5px;
 }
 
 /* ボタン */

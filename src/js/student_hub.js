@@ -45,6 +45,10 @@ function createStudentPasswordField() {
   const toggleBtn = document.createElement("button");
   toggleBtn.type = "button";
   toggleBtn.textContent = "👁️";
+
+  // 学校パスワードボタンと同じデザイン
+  toggleBtn.classList.add("togglePasswordBtn");
+
   toggleBtn.addEventListener("click", () => {
     if (studentPasswordInput.type === "password") {
       studentPasswordInput.type = "text";

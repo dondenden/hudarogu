@@ -1,4 +1,3 @@
-// src/js/student_hub.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -27,26 +26,24 @@ const studentPasswordWrapper = document.getElementById("studentPasswordWrapper")
 const studentPasswordLabel = document.getElementById("studentPasswordLabel");
 const loginButton = document.getElementById("loginButton");
 
-// =========================
-// 学校リスト取得
-// =========================
-const loadSchools = async () => {
-  try {
-    const snap = await getDocs(collection(db, "schoolList"));
-    snap.forEach(docSnap => {
-      const option = document.createElement("option");
-      option.value = docSnap.id;
-      option.textContent = docSnap.id;
-      schoolSelect.appendChild(option);
-    });
-  } catch (err) {
-    console.error("学校リスト取得エラー:", err);
-  }
-};
+// 🔹 学校リストロード
+async function loadSchools() {
+  console.log("学校リストを読み込み中...");
+  const schoolListRef = collection(db, "schoolList");
+  const schoolListSnap = await getDocs(schoolListRef);
 
-// =========================
-// 学校パスワード表示切替
-// =========================
+  schoolListSnap.forEach((docSnap) => {
+    const schoolName = docSnap.id; // ドキュメントIDが学校名
+    console.log("学校名:", schoolName);
+
+    const option = document.createElement("option");
+    option.value = schoolName;
+    option.textContent = schoolName;
+    schoolSelect.appendChild(option);
+  });
+}
+
+// 🔹 学校パスワード表示切替
 toggleSchoolPasswordBtn.addEventListener("click", () => {
   if (schoolPasswordInput.type === "password") {
     schoolPasswordInput.type = "text";
@@ -57,96 +54,99 @@ toggleSchoolPasswordBtn.addEventListener("click", () => {
   }
 });
 
-// =========================
-// 学校選択時
-// =========================
+// 🔹 学校選択
 schoolSelect.addEventListener("change", () => {
+  console.log("学校選択:", schoolSelect.value);
   loginButton.disabled = true;
   passwordWrapper.style.display = "none";
   schoolPasswordInput.value = "";
   studentWrapper.style.display = "none";
   studentPasswordWrapper.style.display = "none";
+
   if (!schoolSelect.value) return;
   passwordWrapper.style.display = "block";
 });
 
-// =========================
-// 学校パスワード確認
-// =========================
+// 🔹 学校パスワード確認
 schoolPasswordInput.addEventListener("blur", async () => {
   const selectedSchool = schoolSelect.value;
   const enteredPassword = schoolPasswordInput.value.trim();
+  console.log("入力パスワード:", enteredPassword);
+
   if (!selectedSchool || !enteredPassword) return;
 
-  try {
-    const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
-    const passwordSnap = await getDoc(passwordDocRef);
-
-    if (!passwordSnap.exists() || passwordSnap.data().password !== enteredPassword) {
-      alert("学校パスワードが間違っています");
-      studentWrapper.style.display = "none";
-      loginButton.disabled = true;
-      return;
-    }
-
-    // 学校ログイン成功 → 生徒入力欄表示
-    studentWrapper.style.display = "block";
-    studentPasswordWrapper.style.display = "none";
+  const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
+  const passwordSnap = await getDoc(passwordDocRef);
+  if (!passwordSnap.exists()) {
+    console.log("パスワードドキュメントが存在しません");
+    alert("学校パスワードが設定されていません");
+    studentWrapper.style.display = "none";
     loginButton.disabled = true;
-
-  } catch (err) {
-    console.error("学校パスワード確認エラー:", err);
+    return;
   }
+
+  if (passwordSnap.data().password !== enteredPassword) {
+    console.log("パスワード不一致");
+    alert("学校パスワードが間違っています");
+    studentWrapper.style.display = "none";
+    loginButton.disabled = true;
+    return;
+  }
+
+  console.log("学校ログイン成功");
+  studentWrapper.style.display = "block";
 });
 
-// =========================
-// 生徒名入力時
-// =========================
+// 🔹 生徒名入力 → パスワード欄切替
 studentNameInput.addEventListener("blur", async () => {
   const selectedSchool = schoolSelect.value;
   const studentName = studentNameInput.value.trim();
+  console.log("生徒名入力:", studentName);
+
   if (!selectedSchool || !studentName) return;
 
-  // 教師が登録した生徒か確認
+  // 教師が作成した生徒のみ許可
   const schoolListDocRef = doc(db, "schoolList", selectedSchool);
   const schoolListSnap = await getDoc(schoolListDocRef);
   if (!schoolListSnap.exists() || !schoolListSnap.data()[studentName]) {
+    console.log("教師が作成した生徒ではない:", studentName);
     alert("この生徒名は登録されていません。教師に追加してもらってください。");
     studentPasswordWrapper.style.display = "none";
     loginButton.disabled = true;
     return;
   }
 
-  // 生徒用ドキュメント確認
+  // 生徒ドキュメント確認
   const studentDocRef = doc(db, selectedSchool, studentName);
   const studentSnap = await getDoc(studentDocRef);
 
   studentPasswordWrapper.style.display = "block";
 
   if (studentSnap.exists()) {
+    console.log("既存生徒 → パスワード入力");
     studentPasswordLabel.innerHTML = `
       パスワード入力:
       <input type="password" id="studentPassword" required>
     `;
   } else {
+    console.log("新規生徒 → パスワード作成");
     studentPasswordLabel.innerHTML = `
       パスワード作成:
       <input type="password" id="studentPassword" required>
     `;
   }
-
-  loginButton.disabled = false;
 });
 
-// =========================
-// ログイン処理
-// =========================
+// 🔹 ログイン処理
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const selectedSchool = schoolSelect.value;
   const studentName = studentNameInput.value.trim();
   const studentPassword = document.getElementById("studentPassword")?.value.trim();
+
+  console.log("ログイン処理開始:", selectedSchool, studentName);
+
   if (!selectedSchool || !studentName || !studentPassword) return;
 
   try {
@@ -154,36 +154,34 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     const studentSnap = await getDoc(studentDocRef);
 
     if (!studentSnap.exists()) {
-      // 新規登録
       await setDoc(studentDocRef, {
         password: studentPassword,
         createdAt: serverTimestamp()
       });
+      console.log("新規生徒登録完了:", studentName);
       alert(`生徒「${studentName}」を新規登録しました！`);
     } else {
       const data = studentSnap.data();
       if (data.password !== studentPassword) {
+        console.log("生徒パスワード不一致");
         alert("生徒パスワードが間違っています");
         return;
       }
+      console.log("既存生徒ログイン成功:", studentName);
     }
 
+    // 成功 → メインページへ
     window.location.href = `student_main.html?school=${encodeURIComponent(selectedSchool)}&student=${encodeURIComponent(studentName)}`;
-
-  } catch (err) {
-    console.error("ログインエラー:", err);
+  } catch (error) {
+    console.error("ログインエラー:", error);
     alert("ログインに失敗しました");
   }
 });
 
-// =========================
-// 戻る
-// =========================
+// 🔹 戻る
 document.getElementById("backButton").addEventListener("click", () => {
   window.location.href = 'index.html';
 });
 
-// =========================
-// 初期ロード
-// =========================
+// 🔹 初期ロード
 loadSchools();

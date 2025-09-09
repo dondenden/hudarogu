@@ -1,14 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  getDocs,
-  setDoc,
-  doc,
-  serverTimestamp
+  getFirestore, collection, getDocs, setDoc, doc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-// Firebase Authentication
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
 // 🔹 Firebase 設定
@@ -26,20 +19,20 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// 🔹 URLパラメータから学校名取得
+// URLパラメータから学校名取得
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 if (!schoolName) {
   alert("学校名が指定されていません。ログインし直してください");
-  window.location.href = 'https://dondenden.github.io/hudarogu/src/index.html';
+  window.location.href = 'index.html';
 }
 
-// 🔹 HTML参照
+// HTML参照
 const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
 
-// 🔹 ランダムパスワード生成関数
+// 🔹 ランダムパスワード生成
 function generatePassword(length = 8) {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let password = "";
@@ -49,10 +42,10 @@ function generatePassword(length = 8) {
   return password;
 }
 
+// 🔹 生徒一覧表示
 async function loadNames() {
   list.innerHTML = "";
   const snap = await getDocs(collection(db, schoolName));
-
   if (snap.empty) {
     const li = document.createElement("li");
     li.textContent = "まだ名前は登録されていません";
@@ -66,16 +59,15 @@ async function loadNames() {
 
     const data = docSnap.data();
     const li = document.createElement("li");
-    li.innerHTML = `<strong>${docId}</strong> | Pass: ${data.password}`;
+    li.innerHTML = `<strong>${docId}</strong> | UID: ${data.uid} | Pass: ${data.password}`;
     list.appendChild(li);
   });
 }
 
-// 🔹 名前登録フォーム（Firestore + Auth）
+// 🔹 名前登録フォーム
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const nameInput = document.getElementById("name");
-  const studentName = nameInput.value.trim();
+  const studentName = document.getElementById("name").value.trim();
   if (!studentName) return;
 
   const invalidChars = /[\/#?\[\]]/;
@@ -85,26 +77,23 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // 🔹 ランダムパスワード生成
     const password = generatePassword(8);
-
-    // 🔹 メールアドレス自動生成
     const email = `${studentName}@${schoolName}.local`;
 
-    // 🔹 Firebase Auth にアカウント作成
+    // Authに登録
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = userCredential.user.uid;
 
+    // Firestoreに保存（パスワードも安全に同期）
     await setDoc(doc(db, schoolName, studentName), {
       createdAt: serverTimestamp(),
-      uid: uid,
-      email: email,
-      password: password   // ここでパスワードも保存
+      uid,
+      email,
+      password
     });
 
-
     alert(`生徒「${studentName}」を登録しました\n初期パスワード: ${password}`);
-    nameInput.value = "";
+    document.getElementById("name").value = "";
     await loadNames();
 
   } catch (error) {
@@ -113,10 +102,10 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// 🔹 戻るボタン処理
+// 戻るボタン
 backButton.addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
+  window.location.href = 'index.html';
 });
 
-// 🔹 初回表示
+// 初回表示
 loadNames();

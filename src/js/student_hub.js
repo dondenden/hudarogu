@@ -1,6 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
 // 🔹 Firebase 設定
 const firebaseConfig = {
@@ -15,7 +14,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
 // 🔹 DOM 取得
 const schoolSelect = document.getElementById("schoolSelect");
@@ -25,47 +23,6 @@ const passwordWrapper = document.getElementById("passwordWrapper");
 const schoolPasswordInput = document.getElementById("schoolPassword");
 const togglePasswordBtn = document.getElementById("togglePassword");
 const loginButton = document.getElementById("loginButton");
-
-// 🔹 生徒パスワード欄作成
-let studentPasswordInput;
-let studentPasswordWrapper;
-
-function createStudentPasswordField() {
-  studentPasswordWrapper = document.createElement("div");
-  studentPasswordWrapper.style.display = "none";
-  studentPasswordWrapper.id = "studentPasswordWrapper";
-
-  const label = document.createElement("label");
-  label.textContent = "生徒パスワード: ";
-
-  studentPasswordInput = document.createElement("input");
-  studentPasswordInput.type = "password";
-  studentPasswordInput.id = "studentPassword";
-
-  const toggleBtn = document.createElement("button");
-  toggleBtn.type = "button";
-  toggleBtn.textContent = "👁️";
-
-  // 学校パスワードボタンと同じデザイン
-  toggleBtn.classList.add("togglePasswordBtn");
-
-  toggleBtn.addEventListener("click", () => {
-    if (studentPasswordInput.type === "password") {
-      studentPasswordInput.type = "text";
-      toggleBtn.textContent = "🙈";
-    } else {
-      studentPasswordInput.type = "password";
-      toggleBtn.textContent = "👁️";
-    }
-  });
-
-  label.appendChild(studentPasswordInput);
-  label.appendChild(toggleBtn);
-  studentPasswordWrapper.appendChild(label);
-  loginForm.insertBefore(studentPasswordWrapper, loginButton);
-}
-
-createStudentPasswordField();
 
 // 🔹 学校リストロード
 async function loadSchools() {
@@ -95,7 +52,6 @@ schoolSelect.addEventListener("change", () => {
   studentSelect.disabled = true;
   loginButton.disabled = true;
   passwordWrapper.style.display = "none";
-  studentPasswordWrapper.style.display = "none";
   schoolPasswordInput.value = "";
   if (!schoolSelect.value) return;
   passwordWrapper.style.display = "block";
@@ -110,7 +66,7 @@ schoolPasswordInput.addEventListener("blur", async () => {
   const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
   const passwordSnap = await getDoc(passwordDocRef);
   if (!passwordSnap.exists() || passwordSnap.data().password !== enteredPassword) {
-    alert("学校パスワードが間違っています");
+    alert("パスワードが間違っています");
     return;
   }
 
@@ -125,32 +81,22 @@ schoolPasswordInput.addEventListener("blur", async () => {
     studentSelect.appendChild(option);
   });
   studentSelect.disabled = false;
-  studentPasswordWrapper.style.display = "block";
+  loginButton.disabled = false;
 });
 
-// 🔹 ログイン処理
+// 🔹 ログイン処理（Firestore 上の平文パスワードを使用）
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectedSchool = schoolSelect.value;
   const selectedStudent = studentSelect.value;
-  const enteredStudentPassword = studentPasswordInput.value.trim();
 
-  if (!selectedSchool || !selectedStudent || !enteredStudentPassword) {
-    alert("すべて入力してください");
+  if (!selectedSchool || !selectedStudent) {
+    alert("学校と生徒を選択してください");
     return;
   }
 
-  try {
-    const studentSnap = await getDoc(doc(db, selectedSchool, selectedStudent));
-    const email = studentSnap.data().email;
-
-    await signInWithEmailAndPassword(auth, email, enteredStudentPassword);
-
-    window.location.href = `student_main.html?school=${selectedSchool}&student=${selectedStudent}`;
-  } catch (error) {
-    console.error(error);
-    alert("生徒パスワードが間違っています");
-  }
+  // ここでは学生のパスワードは使わず、選択された生徒で直接ログイン扱い
+  window.location.href = `student_main.html?school=${encodeURIComponent(selectedSchool)}&student=${encodeURIComponent(selectedStudent)}`;
 });
 
 // 🔹 戻る

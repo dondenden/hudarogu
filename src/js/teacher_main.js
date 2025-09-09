@@ -66,7 +66,7 @@ async function loadNames() {
 
     const data = docSnap.data();
     const li = document.createElement("li");
-    li.innerHTML = `<strong>${docId}</strong> | UID: ${data.uid} | Pass: ${data.password}`;
+    li.innerHTML = `<strong>${docId}</strong> | Pass: ${data.password}`;
     list.appendChild(li);
   });
 }

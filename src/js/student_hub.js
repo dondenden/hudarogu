@@ -105,7 +105,7 @@ studentNameInput.addEventListener("blur", () => {
   }
 });
 
-// 🔹 ログイン（常に新規作成）処理
+// 🔹 ログイン（新規作成）処理
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -120,7 +120,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
   try {
     // 🔸 サブコレクション studentDC に新規ドキュメント作成
-    const studentCollectionRef = collection(db, selectedSchool, "studentDC");
+    const studentCollectionRef = collection(db, "schoolList", selectedSchool, "studentDC");
     const studentDocRef = doc(studentCollectionRef, studentName);
 
     await setDoc(studentDocRef, {

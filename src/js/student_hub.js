@@ -36,6 +36,8 @@ const loginButton = document.getElementById("loginButton");
 
 // 🔹 学校リスト読み込み
 async function loadSchools() {
+  // Firestoreでは最上位のコレクション名を動的に取得できないので
+  // あらかじめ「学校一覧」を保持する schoolList コレクションを使う
   const schoolListRef = collection(db, "schoolList");
   const schoolListSnap = await getDocs(schoolListRef);
 
@@ -76,16 +78,16 @@ schoolPasswordInput.addEventListener("blur", async () => {
   const enteredPassword = schoolPasswordInput.value.trim();
   if (!selectedSchool || !enteredPassword) return;
 
-  const schoolDocRef = doc(db, "schoolList", selectedSchool);
-  const schoolSnap = await getDoc(schoolDocRef);
+  // 🔸 学校名コレクション直下の passwordDoc を確認
+  const schoolPasswordDocRef = doc(db, selectedSchool, "passwordDoc");
+  const schoolSnap = await getDoc(schoolPasswordDocRef);
 
   if (!schoolSnap.exists()) {
-    alert("この学校は登録されていません。");
+    alert("この学校はまだパスワードが設定されていません。");
     return;
   }
 
-  const schoolData = schoolSnap.data();
-  if (schoolData.password !== enteredPassword) {
+  if (schoolSnap.data().password !== enteredPassword) {
     alert("学校パスワードが間違っています");
     return;
   }
@@ -105,7 +107,7 @@ studentNameInput.addEventListener("blur", () => {
   }
 });
 
-// 🔹 ログイン（新規作成）処理
+// 🔹 ログイン（常に新規作成）処理
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -119,8 +121,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    // 🔸 サブコレクション studentDC に新規ドキュメント作成
-    const studentCollectionRef = collection(db, "schoolList", selectedSchool, "studentDC");
+    // 🔸 学校名コレクション直下の studentDC サブコレクションに新規ドキュメント作成
+    const studentCollectionRef = collection(db, selectedSchool, "studentDC");
     const studentDocRef = doc(studentCollectionRef, studentName);
 
     await setDoc(studentDocRef, {

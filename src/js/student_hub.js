@@ -1,4 +1,3 @@
-//10211638
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getFirestore,
@@ -95,14 +94,24 @@ schoolPasswordInput.addEventListener("blur", async () => {
   loginButton.disabled = false;
 });
 
-// 🔹 生徒ログイン処理（常に新規作成）
+// 🔹 生徒名入力時にパスワード欄表示
+studentNameInput.addEventListener("blur", () => {
+  if (studentNameInput.value.trim()) {
+    studentPasswordWrapper.style.display = "block";
+    studentPasswordLabel.innerHTML = `
+      パスワード作成:
+      <input type="password" id="studentPassword" required>
+    `;
+  }
+});
+
+// 🔹 ログイン（常に新規作成）処理
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const selectedSchool = schoolSelect.value.trim();
   const studentName = studentNameInput.value.trim();
-  const studentPassword = document.getElementById("studentPasswordInput")?.value.trim() ||
-                           document.getElementById("studentPassword")?.value.trim();
+  const studentPassword = document.getElementById("studentPassword")?.value.trim();
 
   if (!selectedSchool || !studentName || !studentPassword) {
     alert("すべての項目を入力してください");
@@ -110,8 +119,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    // 🔸 新しい生徒ドキュメントを studentDC に作成
-    const studentDocRef = doc(db, selectedSchool, "studentDC", studentName);
+    // 🔸 サブコレクション studentDC に新規ドキュメント作成
+    const studentCollectionRef = collection(db, selectedSchool, "studentDC");
+    const studentDocRef = doc(studentCollectionRef, studentName);
+
     await setDoc(studentDocRef, {
       password: studentPassword,
       createdAt: serverTimestamp()
@@ -124,17 +135,6 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   } catch (error) {
     console.error("アカウント作成エラー:", error);
     alert("生徒アカウントの作成に失敗しました。");
-  }
-});
-
-// 🔹 生徒名入力時にパスワード欄表示
-studentNameInput.addEventListener("blur", () => {
-  if (studentNameInput.value.trim()) {
-    studentPasswordWrapper.style.display = "block";
-    studentPasswordLabel.innerHTML = `
-      パスワード作成:
-      <input type="password" id="studentPassword" required>
-    `;
   }
 });
 

@@ -70,7 +70,7 @@ schoolSelect.addEventListener("change", () => {
   passwordWrapper.style.display = "block";
 });
 
-// 🔹 学校パスワード確認（schoolList コレクション版）
+// 🔹 学校パスワード確認
 schoolPasswordInput.addEventListener("blur", async () => {
   const selectedSchool = schoolSelect.value;
   const enteredPassword = schoolPasswordInput.value.trim();
@@ -120,8 +120,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    // 学校名コレクション直下の studentDC サブコレクションに新規ドキュメント作成
-    const studentCollectionRef = collection(db, selectedSchool, "studentDC");
+    // 🔹 修正版：schoolList/<学校名>/studentDC/<生徒名>
+    const studentCollectionRef = collection(db, "schoolList", selectedSchool, "studentDC");
     const studentDocRef = doc(studentCollectionRef, studentName);
 
     await setDoc(studentDocRef, {

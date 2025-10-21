@@ -106,7 +106,7 @@ studentNameInput.addEventListener("blur", () => {
   }
 });
 
-// 🔹 ログイン（常に新規作成）処理
+// 🔹 ログイン（生徒アカウント作成）
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -120,9 +120,9 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    // 🔹 修正版：schoolList/<学校名>/studentDC/<生徒名>
-    const studentCollectionRef = collection(db, "schoolList", selectedSchool, "studentDC");
-    const studentDocRef = doc(studentCollectionRef, studentName);
+    // 🔹 学校名コレクション直下の studentDC サブコレクションに生徒作成
+    const studentCollectionRef = collection(db, selectedSchool, "studentDC"); // 学校名コレクション → studentDC サブコレクション
+    const studentDocRef = doc(studentCollectionRef, studentName); // 生徒ドキュメント
 
     await setDoc(studentDocRef, {
       password: studentPassword,

@@ -1,5 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // 🔹 Firebase設定
 const firebaseConfig = {
@@ -26,18 +34,13 @@ const studentPasswordWrapper = document.getElementById("studentPasswordWrapper")
 const studentPasswordLabel = document.getElementById("studentPasswordLabel");
 const loginButton = document.getElementById("loginButton");
 
+// 🔹 学校リスト読み込み
 async function loadSchools() {
   console.log("学校リストを読み込み開始");
   const schoolListRef = collection(db, "schoolList");
   const schoolListSnap = await getDocs(schoolListRef);
-  console.log("取得件数:", schoolListSnap.size);
-
-  if (schoolListSnap.empty) {
-    console.warn("schoolList コレクションにドキュメントが存在しません");
-  }
 
   schoolListSnap.forEach((docSnap) => {
-    console.log("ドキュメントID:", docSnap.id, "データ:", docSnap.data());
     const option = document.createElement("option");
     option.value = docSnap.id;
     option.textContent = docSnap.id;
@@ -58,7 +61,6 @@ toggleSchoolPasswordBtn.addEventListener("click", () => {
 
 // 🔹 学校選択
 schoolSelect.addEventListener("change", () => {
-  console.log("学校選択:", schoolSelect.value);
   loginButton.disabled = true;
   passwordWrapper.style.display = "none";
   schoolPasswordInput.value = "";
@@ -73,25 +75,20 @@ schoolSelect.addEventListener("change", () => {
 schoolPasswordInput.addEventListener("blur", async () => {
   const selectedSchool = schoolSelect.value;
   const enteredPassword = schoolPasswordInput.value.trim();
-  console.log("入力パスワード:", enteredPassword);
-
   if (!selectedSchool || !enteredPassword) return;
 
-  const passwordDocRef = doc(db, selectedSchool, "passwordDoc");
-  const passwordSnap = await getDoc(passwordDocRef);
-  if (!passwordSnap.exists()) {
-    console.log("パスワードドキュメントが存在しません");
-    alert("学校パスワードが設定されていません");
-    studentWrapper.style.display = "none";
-    loginButton.disabled = true;
+  // 🔸 schoolList の中の学校情報を確認
+  const schoolDocRef = doc(db, "schoolList", selectedSchool);
+  const schoolSnap = await getDoc(schoolDocRef);
+
+  if (!schoolSnap.exists()) {
+    alert("この学校は登録されていません。");
     return;
   }
 
-  if (passwordSnap.data().password !== enteredPassword) {
-    console.log("パスワード不一致");
+  const schoolData = schoolSnap.data();
+  if (schoolData.password !== enteredPassword) {
     alert("学校パスワードが間違っています");
-    studentWrapper.style.display = "none";
-    loginButton.disabled = true;
     return;
   }
 
@@ -103,35 +100,21 @@ schoolPasswordInput.addEventListener("blur", async () => {
 studentNameInput.addEventListener("blur", async () => {
   const selectedSchool = schoolSelect.value;
   const studentName = studentNameInput.value.trim();
-  console.log("生徒名入力:", studentName);
 
   if (!selectedSchool || !studentName) return;
 
-  // 教師が作成した生徒のみ許可
-  const schoolListDocRef = doc(db, "schoolList", selectedSchool);
-  const schoolListSnap = await getDoc(schoolListDocRef);
-  if (!schoolListSnap.exists() || !schoolListSnap.data()[studentName]) {
-    console.log("教師が作成した生徒ではない:", studentName);
-    alert("この生徒名は登録されていません。教師に追加してもらってください。");
-    studentPasswordWrapper.style.display = "none";
-    loginButton.disabled = true;
-    return;
-  }
-
-  // 生徒ドキュメント確認
-  const studentDocRef = doc(db, selectedSchool, studentName);
+  // 🔸 生徒サブコレクション確認（学校名コレクション）
+  const studentDocRef = doc(db, selectedSchool, "students", studentName);
   const studentSnap = await getDoc(studentDocRef);
 
   studentPasswordWrapper.style.display = "block";
 
   if (studentSnap.exists()) {
-    console.log("既存生徒 → パスワード入力");
     studentPasswordLabel.innerHTML = `
       パスワード入力:
       <input type="password" id="studentPassword" required>
     `;
   } else {
-    console.log("新規生徒 → パスワード作成");
     studentPasswordLabel.innerHTML = `
       パスワード作成:
       <input type="password" id="studentPassword" required>
@@ -147,12 +130,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const studentName = studentNameInput.value.trim();
   const studentPassword = document.getElementById("studentPassword")?.value.trim();
 
-  console.log("ログイン処理開始:", selectedSchool, studentName);
-
   if (!selectedSchool || !studentName || !studentPassword) return;
 
   try {
-    const studentDocRef = doc(db, selectedSchool, studentName);
+    const studentDocRef = doc(db, selectedSchool, "students", studentName);
     const studentSnap = await getDoc(studentDocRef);
 
     if (!studentSnap.exists()) {
@@ -160,12 +141,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
         password: studentPassword,
         createdAt: serverTimestamp()
       });
-      console.log("新規生徒登録完了:", studentName);
       alert(`生徒「${studentName}」を新規登録しました！`);
     } else {
       const data = studentSnap.data();
       if (data.password !== studentPassword) {
-        console.log("生徒パスワード不一致");
         alert("生徒パスワードが間違っています");
         return;
       }

@@ -1,3 +1,4 @@
+//10211558
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getFirestore,
@@ -33,7 +34,7 @@ schoolNameInput.addEventListener("blur", async () => {
   const schoolName = schoolNameInput.value.trim();
   if (!schoolName) return;
 
-  const passwordDocRef = doc(db, schoolName, "passwordDoc");
+  const passwordDocRef = doc(db, "schoolList", schoolName);
   const passwordSnap = await getDoc(passwordDocRef);
 
   // パスワード欄を表示
@@ -78,37 +79,34 @@ form.addEventListener("submit", async (e) => {
   if (!schoolName || !schoolPassword) return;
 
   try {
-    // 🔹 既存schoolNameコレクションのpasswordDoc
-    const passwordDocRef = doc(db, schoolName, "passwordDoc");
-    const passwordSnap = await getDoc(passwordDocRef);
-
-    // 🔹 schoolListコレクションにもドキュメントを作る
+    // 🔹 Firestore参照
     const schoolListDocRef = doc(db, "schoolList", schoolName);
+    const passwordSnap = await getDoc(schoolListDocRef);
 
     if (!passwordSnap.exists()) {
-      // 新規登録
+      // 🔸 新規登録
       const data = {
-        password: schoolPassword,
+        password: schoolPassword,        // パスワードも保存！
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
-      // 1️⃣ 元の場所に保存
-      await setDoc(passwordDocRef, data);
-
-      // 2️⃣ schoolList にも同時登録
       await setDoc(schoolListDocRef, data);
+
+      // 🔸 学校独自のサブコレクションも作成（例：schoolList/学校名/students）
+      const passwordDocRef = doc(db, "schoolList", schoolName, "meta", "passwordDoc");
+      await setDoc(passwordDocRef, data);
 
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
-      // パスワードチェック
+      // 🔸 既存ログイン（パスワード照合）
       const data = passwordSnap.data();
       if (data.password !== schoolPassword) {
         alert("パスワードが間違っています。");
         return;
       }
 
-      // 🔹 ログイン時には schoolList の更新日時だけ上書き
+      // ログイン成功 → 更新時刻を更新
       await setDoc(
         schoolListDocRef,
         { updatedAt: serverTimestamp() },
@@ -116,15 +114,15 @@ form.addEventListener("submit", async (e) => {
       );
     }
 
-    // 成功したら名前登録画面へ遷移
+    // 🔸 成功時に teacher_main.html に遷移
     window.location.href = `https://dondenden.github.io/hudarogu/teacher_main.html?school=${encodeURIComponent(schoolName)}`;
   } catch (error) {
     console.error("Error: ", error);
-    alert("エラーが発生しました。");
+    alert("エラーが発生しました: " + error.message);
   }
 });
 
 // 戻るボタン処理
 backButton.addEventListener("click", () => {
-  window.location.href = 'https://dondenden.github.io/hudarogu/index.html'; // トップページに戻る
+  window.location.href = 'https://dondenden.github.io/hudarogu/index.html';
 });

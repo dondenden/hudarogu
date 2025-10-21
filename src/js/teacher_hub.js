@@ -78,15 +78,26 @@ form.addEventListener("submit", async (e) => {
   if (!schoolName || !schoolPassword) return;
 
   try {
+    // 🔹 既存schoolNameコレクションのpasswordDoc
     const passwordDocRef = doc(db, schoolName, "passwordDoc");
     const passwordSnap = await getDoc(passwordDocRef);
 
+    // 🔹 schoolListコレクションにもドキュメントを作る
+    const schoolListDocRef = doc(db, "schoolList", schoolName);
+
     if (!passwordSnap.exists()) {
       // 新規登録
-      await setDoc(passwordDocRef, {
+      const data = {
         password: schoolPassword,
-        createdAt: serverTimestamp()
-      });
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      // 1️⃣ 元の場所に保存
+      await setDoc(passwordDocRef, data);
+
+      // 2️⃣ schoolList にも同時登録
+      await setDoc(schoolListDocRef, data);
 
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
@@ -96,6 +107,13 @@ form.addEventListener("submit", async (e) => {
         alert("パスワードが間違っています。");
         return;
       }
+
+      // 🔹 ログイン時には schoolList の更新日時だけ上書き
+      await setDoc(
+        schoolListDocRef,
+        { updatedAt: serverTimestamp() },
+        { merge: true }
+      );
     }
 
     // 成功したら名前登録画面へ遷移

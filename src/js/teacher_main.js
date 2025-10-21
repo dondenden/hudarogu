@@ -1,4 +1,4 @@
-//10211518
+//10211524
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getFirestore,
@@ -9,7 +9,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// 🔹 Firebase 設定
+// Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAHb1pT_SgqolYZdpOsmQdLK-OMjNVpVYA",
   authDomain: "hudarogu-71a4f.firebaseapp.com",
@@ -40,8 +40,8 @@ const backButton = document.getElementById("backButton");
 async function loadNames() {
   list.innerHTML = "";
 
-  // ✅ HUB構造対応：「schoolList」を削除し、学校名コレクション直下の students サブコレクションを参照
-  const studentsColRef = collection(db, schoolName, "students");
+  // ✅ 修正ポイント：「ダミードキュメント 'schoolDoc'」を挟む
+  const studentsColRef = collection(db, schoolName, "schoolDoc", "students");
   const studentsSnap = await getDocs(studentsColRef);
 
   if (studentsSnap.empty) {
@@ -51,7 +51,6 @@ async function loadNames() {
     return;
   }
 
-  // 生徒名をリスト表示
   studentsSnap.forEach(docSnap => {
     const li = document.createElement("li");
     li.textContent = docSnap.id;
@@ -72,8 +71,8 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // ✅ HUB構造対応：「schoolList」を削除
-    const studentDocRef = doc(db, schoolName, "students", studentName);
+    // ✅ 同じように 'schoolDoc' を経由
+    const studentDocRef = doc(db, schoolName, "schoolDoc", "students", studentName);
     await setDoc(studentDocRef, {
       createdAt: serverTimestamp()
     });

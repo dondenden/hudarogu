@@ -1,4 +1,4 @@
-//10221313
+// ✅ 修正版 teacher_hub.js（schoolDCをコレクションに）
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
@@ -6,7 +6,8 @@ import {
   doc,
   getDoc,
   setDoc,
-  serverTimestamp
+  serverTimestamp,
+  collection
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Firebase 設定
@@ -35,22 +36,20 @@ schoolNameInput.addEventListener("blur", async () => {
   const schoolName = schoolNameInput.value.trim();
   if (!schoolName) return;
 
-  // 参照：東桜学館/DC/schoolDC/info
-  const passwordDocRef = doc(db, schoolName, "DC", "schoolDC", "info");
+  // ✅ 参照：東桜学館/DC/schoolDC/info
+  const passwordDocRef = doc(db, schoolName, "DC", "schoolDC", "info"); // ← 修正後でもOK
   const passwordSnap = await getDoc(passwordDocRef);
 
   // パスワード欄を表示
   passwordWrapper.style.display = "block";
 
   if (!passwordSnap.exists()) {
-    // 新規登録用
     passwordLabel.innerHTML = `
       パスワード作成:
       <input type="password" id="schoolPassword" required>
       <button type="button" id="togglePassword">👁️</button>
     `;
   } else {
-    // 既存ログイン用
     passwordLabel.innerHTML = `
       パスワード入力:
       <input type="password" id="schoolPassword" required>
@@ -58,7 +57,7 @@ schoolNameInput.addEventListener("blur", async () => {
     `;
   }
 
-  // パスワード表示切替ボタン
+  // パスワード表示切替
   const toggleBtn = document.getElementById("togglePassword");
   const passwordInput = document.getElementById("schoolPassword");
   toggleBtn.addEventListener("click", () => {
@@ -81,7 +80,7 @@ form.addEventListener("submit", async (e) => {
   if (!schoolName || !schoolPassword) return;
 
   try {
-    // Firestoreの構造: 東桜学館/DC/schoolDC/info
+    // ✅ Firestore構造: 東桜学館/DC/schoolDC/info
     const infoDocRef = doc(db, schoolName, "DC", "schoolDC", "info");
     const infoSnap = await getDoc(infoDocRef);
 
@@ -93,7 +92,10 @@ form.addEventListener("submit", async (e) => {
         updatedAt: serverTimestamp()
       };
 
-      await setDoc(infoDocRef, data);
+      // ✅ schoolDC をコレクションとして扱う
+      const schoolDCCollection = collection(db, schoolName, "DC", "schoolDC");
+      const infoDoc = doc(schoolDCCollection, "info");
+      await setDoc(infoDoc, data);
 
       alert(`学校「${schoolName}」を新規登録しました！`);
     } else {
@@ -110,7 +112,7 @@ form.addEventListener("submit", async (e) => {
       alert(`学校「${schoolName}」でログインしました！`);
     }
 
-    // 🔸 成功後、teacher_main.htmlへ遷移
+    // 🔸 成功後に遷移
     window.location.href = `teacher_main.html?school=${encodeURIComponent(schoolName)}`;
   } catch (error) {
     console.error("Error:", error);

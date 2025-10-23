@@ -1,4 +1,4 @@
-// 10211524 完全修正版（studentDC/studentmember に保存）
+// 10211524 修正版（studentDC/studentmember/members に保存）
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
@@ -21,29 +21,31 @@ const firebaseConfig = {
   measurementId: "G-EVDBZ70E5C"
 };
 
+// Firebase 初期化
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // URLパラメータから学校名を取得
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
+
 if (!schoolName) {
   alert("学校名が指定されていません。ログインし直してください。");
-  window.location.href = "index.html";
+  window.location.href = 'index.html';
 }
 
-// HTML参照
+// HTML要素参照
 const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
 
-// 🔹 生徒一覧表示（studentDC/studentmember から）
+// 🔹 生徒一覧を読み込む関数
 async function loadNames() {
   list.innerHTML = "";
 
   try {
-    // ✅ 生徒一覧の参照先：東桜学館/DC/studentDC/studentmember
-    const studentsColRef = collection(db, schoolName, "DC", "studentDC", "studentmember");
+    // ✅ 参照先: 東桜学館/DC/studentDC/studentmember/members
+    const studentsColRef = collection(db, schoolName, "DC", "studentDC", "studentmember", "members");
     const studentsSnap = await getDocs(studentsColRef);
 
     if (studentsSnap.empty) {
@@ -72,6 +74,7 @@ form.addEventListener("submit", async (e) => {
   const studentName = document.getElementById("name").value.trim();
   if (!studentName) return;
 
+  // 使用禁止文字チェック
   const invalidChars = /[\/#?\[\]]/;
   if (invalidChars.test(studentName)) {
     alert("名前に使えない文字が含まれています。\n使用できない文字: / # ? [ ]");
@@ -79,8 +82,8 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // ✅ 保存先：東桜学館/DC/studentDC/studentmember/生徒名
-    const studentDocRef = doc(db, schoolName, "DC", "studentDC", "studentmember", studentName);
+    // ✅ 保存先: 東桜学館/DC/studentDC/studentmember/members/生徒名
+    const studentDocRef = doc(db, schoolName, "DC", "studentDC", "studentmember", "members", studentName);
     await setDoc(studentDocRef, {
       createdAt: serverTimestamp()
     });
@@ -97,8 +100,8 @@ form.addEventListener("submit", async (e) => {
 
 // 🔹 戻るボタン
 backButton.addEventListener("click", () => {
-  window.location.href = "index.html";
+  window.location.href = 'index.html';
 });
 
-// 🔹 初回ロード
+// 初回表示時に一覧読み込み
 loadNames();

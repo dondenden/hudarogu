@@ -1,4 +1,5 @@
-// 10211524 修正版（studentDCに保存する版）
+// 10211524 完全修正版（studentDC/studentmember に保存）
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getFirestore,
@@ -23,12 +24,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// URLパラメータから学校名取得
+// URLパラメータから学校名を取得
 const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 if (!schoolName) {
-  alert("学校名が指定されていません。ログインし直してください");
-  window.location.href = 'index.html';
+  alert("学校名が指定されていません。ログインし直してください。");
+  window.location.href = "index.html";
 }
 
 // HTML参照
@@ -36,31 +37,38 @@ const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
 
-// 🔹 生徒一覧表示（studentDCから）
+// 🔹 生徒一覧表示（studentDC/studentmember から）
 async function loadNames() {
   list.innerHTML = "";
 
-  // ✅ 生徒一覧の参照先：東桜学館/DC/studentDC
-  const studentsColRef = collection(db, schoolName, "DC", "studentDC");
-  const studentsSnap = await getDocs(studentsColRef);
+  try {
+    // ✅ 生徒一覧の参照先：東桜学館/DC/studentDC/studentmember
+    const studentsColRef = collection(db, schoolName, "DC", "studentDC", "studentmember");
+    const studentsSnap = await getDocs(studentsColRef);
 
-  if (studentsSnap.empty) {
-    const li = document.createElement("li");
-    li.textContent = "まだ生徒は登録されていません。";
-    list.appendChild(li);
-    return;
+    if (studentsSnap.empty) {
+      const li = document.createElement("li");
+      li.textContent = "まだ生徒は登録されていません。";
+      list.appendChild(li);
+      return;
+    }
+
+    studentsSnap.forEach(docSnap => {
+      const li = document.createElement("li");
+      li.textContent = docSnap.id;
+      list.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("読み込みエラー:", error);
+    alert("生徒一覧の取得に失敗しました: " + error.message);
   }
-
-  studentsSnap.forEach(docSnap => {
-    const li = document.createElement("li");
-    li.textContent = docSnap.id;
-    list.appendChild(li);
-  });
 }
 
-// 🔹 名前登録フォーム
+// 🔹 名前登録フォーム送信処理
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const studentName = document.getElementById("name").value.trim();
   if (!studentName) return;
 
@@ -71,7 +79,7 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // ✅ 保存先：東桜学館/DC/studentDC/生徒名
+    // ✅ 保存先：東桜学館/DC/studentDC/studentmember/生徒名
     const studentDocRef = doc(db, schoolName, "DC", "studentDC", "studentmember", studentName);
     await setDoc(studentDocRef, {
       createdAt: serverTimestamp()
@@ -79,6 +87,7 @@ form.addEventListener("submit", async (e) => {
 
     document.getElementById("name").value = "";
     await loadNames();
+    alert(`生徒「${studentName}」を登録しました！`);
 
   } catch (error) {
     console.error("登録エラー:", error);
@@ -86,10 +95,10 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// 戻るボタン
+// 🔹 戻るボタン
 backButton.addEventListener("click", () => {
-  window.location.href = 'index.html';
+  window.location.href = "index.html";
 });
 
-// 初回表示
+// 🔹 初回ロード
 loadNames();

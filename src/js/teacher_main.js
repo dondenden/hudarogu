@@ -1,4 +1,4 @@
-//10211524
+// 10211524 修正版（studentDCに保存する版）
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getFirestore,
@@ -36,17 +36,17 @@ const form = document.getElementById("nameForm");
 const list = document.getElementById("nameList");
 const backButton = document.getElementById("backButton");
 
-// 🔹 生徒一覧表示
+// 🔹 生徒一覧表示（studentDCから）
 async function loadNames() {
   list.innerHTML = "";
 
-  // ✅ 修正ポイント：「ダミードキュメント 'schoolDoc'」を挟む
-  const studentsColRef = collection(db, schoolName, "schoolDoc", "students");
+  // ✅ 生徒一覧の参照先：東桜学館/DC/studentDC
+  const studentsColRef = collection(db, schoolName, "DC", "studentDC");
   const studentsSnap = await getDocs(studentsColRef);
 
   if (studentsSnap.empty) {
     const li = document.createElement("li");
-    li.textContent = "まだ名前は登録されていません";
+    li.textContent = "まだ生徒は登録されていません。";
     list.appendChild(li);
     return;
   }
@@ -71,8 +71,8 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // ✅ 同じように 'schoolDoc' を経由
-    const studentDocRef = doc(db, schoolName, "schoolDoc", "students", studentName);
+    // ✅ 保存先：東桜学館/DC/studentDC/生徒名
+    const studentDocRef = doc(db, schoolName, "DC", "studentDC", studentName);
     await setDoc(studentDocRef, {
       createdAt: serverTimestamp()
     });

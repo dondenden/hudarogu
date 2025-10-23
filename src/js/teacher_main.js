@@ -72,7 +72,7 @@ form.addEventListener("submit", async (e) => {
 
   try {
     // ✅ 保存先：東桜学館/DC/studentDC/生徒名
-    const studentDocRef = doc(db, schoolName, "DC", "studentDC", studentName);
+    const studentDocRef = doc(db, schoolName, "DC", "studentDC", "studentmember", studentName);
     await setDoc(studentDocRef, {
       createdAt: serverTimestamp()
     });

@@ -120,7 +120,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    // 🔹 ① 学校ごとの studentDC コレクションに保存
+    // 🔹 ① 学校ごとの studentDC コレクションに生徒情報を保存
     const studentCollectionRef = collection(db, selectedSchool, "DC", "studentDC");
     const studentDocRef = doc(studentCollectionRef, studentName);
 
@@ -129,8 +129,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       createdAt: serverTimestamp()
     });
 
-    // 🔹 ② DC直下に「ユーザーデータ」ドキュメントを作成/更新
-    const userDataRef = doc(db, selectedSchool, "DC", "ユーザーデータ");
+    // 🔹 ② DC直下の userDC コレクション内に「ユーザーデータ」ドキュメントを保存
+    const userDataRef = doc(db, selectedSchool, "DC", "userDC", "ユーザーデータ");
     await setDoc(userDataRef, {
       name: studentName,
       password: studentPassword,

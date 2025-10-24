@@ -76,20 +76,19 @@ schoolPasswordInput.addEventListener("blur", async () => {
   const enteredPassword = schoolPasswordInput.value.trim();
   if (!selectedSchool || !enteredPassword) return;
 
-  // schoolList コレクション内の学校ドキュメントを参照
-  const schoolDocRef = doc(db, "schoolList", selectedSchool);
-  const schoolSnap = await getDoc(schoolDocRef);
-
-  if (!schoolSnap.exists()) {
-    alert("この学校は登録されていません。");
-    return;
+  const infoDocRef = doc(db, selectedSchool, "DC", "schoolDC", "info");
+  const infoSnap = await getDoc(infoDocRef);
+  if (!infoSnap.exists()) {
+  alert("学校情報が見つかりません");
+  return;
   }
-
-  const data = schoolSnap.data();
+  
+  const data = infoSnap.data();
   if (data.password !== enteredPassword) {
     alert("学校パスワードが間違っています");
     return;
   }
+
 
   studentWrapper.style.display = "block";
   loginButton.disabled = false;

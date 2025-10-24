@@ -1,4 +1,4 @@
-// ✅ 修正版 teacher_hub.js（schoolDCをコレクションに）
+// ✅ teacher_hub.js（schoolList + schoolDC/info対応版）
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
@@ -6,6 +6,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  getDocs,
   serverTimestamp,
   collection
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -36,8 +37,8 @@ schoolNameInput.addEventListener("blur", async () => {
   const schoolName = schoolNameInput.value.trim();
   if (!schoolName) return;
 
-  // ✅ 参照：東桜学館/DC/schoolDC/info
-  const passwordDocRef = doc(db, schoolName, "DC", "schoolDC", "info"); // ← 修正後でもOK
+  // パスワード参照：各学校コレクション/DC/schoolDC/info
+  const passwordDocRef = doc(db, schoolName, "DC", "schoolDC", "info");
   const passwordSnap = await getDoc(passwordDocRef);
 
   // パスワード欄を表示
@@ -80,7 +81,17 @@ form.addEventListener("submit", async (e) => {
   if (!schoolName || !schoolPassword) return;
 
   try {
-    // ✅ Firestore構造: 東桜学館/DC/schoolDC/info
+    // schoolList に学校名が存在するかチェック
+    const schoolListRef = collection(db, "schoolList");
+    const schoolDocs = await getDocs(schoolListRef);
+    const schoolExists = schoolDocs.docs.some(doc => doc.id === schoolName);
+
+    if (!schoolExists) {
+      // 🔸 schoolList に新規学校追加
+      await setDoc(doc(db, "schoolList", schoolName), { createdAt: serverTimestamp() });
+    }
+
+    // ✅ Firestore構造: 各学校名/DC/schoolDC/info
     const infoDocRef = doc(db, schoolName, "DC", "schoolDC", "info");
     const infoSnap = await getDoc(infoDocRef);
 
@@ -92,7 +103,7 @@ form.addEventListener("submit", async (e) => {
         updatedAt: serverTimestamp()
       };
 
-      // ✅ schoolDC をコレクションとして扱う
+      // schoolDC コレクションに info ドキュメント作成
       const schoolDCCollection = collection(db, schoolName, "DC", "schoolDC");
       const infoDoc = doc(schoolDCCollection, "info");
       await setDoc(infoDoc, data);

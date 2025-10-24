@@ -78,18 +78,19 @@ schoolPasswordInput.addEventListener("blur", async () => {
 
   const infoDocRef = doc(db, selectedSchool, "DC", "schoolDC", "info");
   const infoSnap = await getDoc(infoDocRef);
+
   if (!infoSnap.exists()) {
-  alert("学校情報が見つかりません");
-  return;
+    alert("学校情報が見つかりません");
+    return;
   }
-  
+
   const data = infoSnap.data();
   if (data.password !== enteredPassword) {
     alert("学校パスワードが間違っています");
     return;
   }
 
-
+  // ✅ 正しいパスワードなら次へ
   studentWrapper.style.display = "block";
   loginButton.disabled = false;
 });
@@ -119,19 +120,29 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    // 🔹 学校名コレクション直下の studentDC サブコレクションに生徒作成
-    const studentCollectionRef = collection(db, selectedSchool, "studentDC"); // 学校名コレクション → studentDC サブコレクション
-    const studentDocRef = doc(studentCollectionRef, studentName); // 生徒ドキュメント
+    // 🔹 ① 学校ごとの studentDC コレクションに保存
+    const studentCollectionRef = collection(db, selectedSchool, "DC", "studentDC");
+    const studentDocRef = doc(studentCollectionRef, studentName);
 
     await setDoc(studentDocRef, {
       password: studentPassword,
       createdAt: serverTimestamp()
     });
 
-    alert(`生徒「${studentName}」を新しく登録しました！`);
+    // 🔹 ② DC直下に「ユーザーデータ」ドキュメントを作成/更新
+    const userDataRef = doc(db, selectedSchool, "DC", "ユーザーデータ");
+    await setDoc(userDataRef, {
+      name: studentName,
+      password: studentPassword,
+      createdAt: serverTimestamp(),
+      school: selectedSchool
+    });
+
+    alert(`生徒「${studentName}」を登録しました！`);
 
     // 成功 → 生徒メインページへ
     window.location.href = `student_main.html?school=${encodeURIComponent(selectedSchool)}&student=${encodeURIComponent(studentName)}`;
+
   } catch (error) {
     console.error("アカウント作成エラー:", error);
     alert("生徒アカウントの作成に失敗しました。");

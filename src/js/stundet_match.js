@@ -20,14 +20,13 @@ const params = new URLSearchParams(window.location.search);
 const schoolName = params.get("school");
 const studentName = params.get("student");
 
-// URLパラメータ文字列を保持
-const currentParams = window.location.search;
-
+// パラメータ確認
 if (!schoolName || !studentName) {
   alert("ログイン情報がありません。");
   window.location.href = 'index.html';
 }
 
+// DOM取得
 document.addEventListener("DOMContentLoaded", async () => {
   const studentInfo = document.getElementById("studentInfo");
   const matchForm = document.getElementById("matchForm");
@@ -38,51 +37,65 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   studentInfo.textContent = `${schoolName}の${studentName}さん`;
 
-  // 対戦相手ロード
+  // 🔹 対戦相手リスト読み込み（同じ学校の他の生徒を表示）
   async function loadOpponents() {
     opponentSelect.innerHTML = '<option value="">-- 対戦相手を選択 --</option>';
-    const snap = await getDocs(collection(db, schoolName));
-    snap.forEach(docSnap => {
+
+    const studentSnap = await getDocs(collection(db, schoolName, "DC", "studentDC"));
+    studentSnap.forEach((docSnap) => {
       const name = docSnap.id;
-      if (name === "passwordDoc" || name === studentName) return;
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      opponentSelect.appendChild(option);
+      if (name !== studentName) {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        opponentSelect.appendChild(option);
+      }
     });
   }
 
-  // 試合結果保存
+  // 🔹 試合結果保存
   matchForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const opponent = opponentSelect.value;
     const score = scoreInput.value;
     const date = matchDateInput.value;
-    const result = matchForm.result.value; // ラジオボタンの値
+    const result = matchForm.result.value;
 
-    if (!opponent || score === "" || !date || !result) return;
+    if (!opponent || score === "" || !date || !result) {
+      alert("全ての項目を入力してください。");
+      return;
+    }
 
     try {
-      await addDoc(collection(db, schoolName, studentName, "matches"), {
+      // ✅ username配下のmatchesに保存
+      const matchRef = collection(db, schoolName, "DC", "username", studentName, "matches");
+
+      await addDoc(matchRef, {
         opponent,
         score: Number(score),
         date,
         result,
         createdAt: serverTimestamp()
       });
-      //alert("試合結果を保存しました！");
+
+      alert("試合結果を保存しました！");
       matchForm.reset();
-      window.location.href = `https://dondenden.github.io/hudarogu/student_main.html${currentParams}`;
+
+      // 学生メインページへ戻る
+      window.location.href = `student_main.html?school=${encodeURIComponent(schoolName)}&student=${encodeURIComponent(studentName)}`;
+
     } catch (error) {
       console.error("保存エラー:", error);
-      alert("保存に失敗しました");
+      alert("試合データの保存に失敗しました。");
     }
   });
 
-  // 戻るボタン
+  // 🔹 戻るボタン
   backButton.addEventListener("click", () => {
-    window.location.href = `https://dondenden.github.io/hudarogu/student_main.html${currentParams}`;
+    window.location.href = `student_main.html?school=${encodeURIComponent(schoolName)}&student=${encodeURIComponent(studentName)}`;
   });
 
+  // 初期化
   await loadOpponents();
 });

@@ -100,7 +100,7 @@ studentNameInput.addEventListener("blur", () => {
   if (studentNameInput.value.trim()) {
     studentPasswordWrapper.style.display = "block";
     studentPasswordLabel.innerHTML = `
-      パスワード作成:
+      パスワード:
       <input type="password" id="studentPassword" required>
     `;
   }

@@ -4,7 +4,6 @@ import {
   collection, 
   addDoc, 
   getDocs, 
-  doc,
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -49,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     opponentSelect.innerHTML = '<option value="">-- 対戦相手を選択 --</option>';
 
     try {
-      // ✅ 各ドキュメント名が生徒名になっている
+      // ✅ 生徒一覧取得
       const membersRef = collection(db, schoolName, "DC", "studentDC", "studentmember", "members");
       const membersSnap = await getDocs(membersRef);
 
@@ -84,8 +83,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-      // ✅ username配下のmatchesに保存
-      const matchRef = collection(db, schoolName, "DC", "username", studentName, "matches");
+      // ✅ 保存先を studentDC に変更
+      const matchRef = collection(db, schoolName, "DC", "studentDC", studentName, "matches");
 
       await addDoc(matchRef, {
         opponent,

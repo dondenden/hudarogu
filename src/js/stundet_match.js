@@ -1,5 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  doc,
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Firebase 設定
 const firebaseConfig = {
@@ -37,20 +44,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   studentInfo.textContent = `${schoolName}の${studentName}さん`;
 
-  // 🔹 対戦相手リスト読み込み（同じ学校の他の生徒を表示）
+  // 🔹 対戦相手リスト読み込み（members コレクションから）
   async function loadOpponents() {
     opponentSelect.innerHTML = '<option value="">-- 対戦相手を選択 --</option>';
 
-    const studentSnap = await getDocs(collection(db, schoolName, "DC", "studentDC"));
-    studentSnap.forEach((docSnap) => {
-      const name = docSnap.id;
-      if (name !== studentName) {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        opponentSelect.appendChild(option);
-      }
-    });
+    try {
+      // ✅ 各ドキュメント名が生徒名になっている
+      const membersRef = collection(db, schoolName, "DC", "studentDC", "studentmember", "members");
+      const membersSnap = await getDocs(membersRef);
+
+      membersSnap.forEach((docSnap) => {
+        const name = docSnap.id;
+        if (name !== studentName) {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          opponentSelect.appendChild(option);
+        }
+      });
+
+    } catch (error) {
+      console.error("対戦相手リスト読み込みエラー:", error);
+      alert("生徒リストの読み込みに失敗しました。");
+    }
   }
 
   // 🔹 試合結果保存

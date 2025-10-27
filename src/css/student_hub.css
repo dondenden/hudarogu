@@ -9,8 +9,8 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow-y: auto;  /* ← 自動縦スクロールを許可 */
-    overflow-x: hidden; /* 横スクロールは常に禁止 */
+    overflow-y: auto;  /* 縦スクロールを許可 */
+    overflow-x: hidden; /* 横スクロール禁止 */
     box-sizing: border-box;
 }
 
@@ -51,8 +51,9 @@ label {
     gap: 6px;
 }
 
-/* 入力・選択 */
+/* 入力・選択欄（text, password, select）すべて統一 */
 select,
+input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 10px 12px;
@@ -64,7 +65,8 @@ input[type="password"] {
 
 /* パスワード表示切替ボタン */
 #togglePassword,
-.togglePasswordBtn {
+.togglePasswordBtn,
+#toggleSchoolPassword {
     padding: 6px 10px;
     font-size: 0.9rem;
     cursor: pointer;
@@ -106,6 +108,12 @@ button:active {
     background-color: #475569;
 }
 
+/* 生徒パスワードや学校パスワードのラベル調整 */
+#studentPasswordLabel,
+#passwordWrapper label {
+    gap: 4px;
+}
+
 /* スマホ対応 */
 @media (max-width: 500px) {
     h1 {
@@ -114,6 +122,7 @@ button:active {
     }
 
     select,
+    input[type="text"],
     input[type="password"] {
         font-size: 0.9rem;
         padding: 8px 10px;

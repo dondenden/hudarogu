@@ -56,98 +56,121 @@ toggleHistoryBtn.addEventListener("click",()=>{
     }
 });
 
+// Chart.js インスタンス保持（再描画用）
+let winRateChartInstance = null;
+let dailyAvgChartInstance = null;
+let opponentChartInstance = null;
+let scoreChartInstance = null;
+
 // データ読み込み
 async function loadMatches(){
-    const matchesSnap = await getDocs(query(
-        collection(db, schoolName, studentName, "matches"),
-        orderBy("createdAt","desc")
-    ));
+    try {
+        // Firestoreの正しい階層
+        const matchesRef = collection(
+            db,
+            schoolName,   // 例: "東桜学館"
+            "DC",         // DC ドキュメント
+            "studentDC",  // studentDC コレクション
+            studentName,  // 例: "山田太郎"
+            "matches"     // matches コレクション
+        );
 
-    const matches = [];
-    matchesSnap.forEach(doc => matches.push(doc.data()));
+        const matchesSnap = await getDocs(query(matchesRef, orderBy("createdAt","desc")));
+        const matches = [];
+        matchesSnap.forEach(doc => matches.push(doc.data()));
 
-    const total = matches.length;
-    const wins = matches.filter(m=>m.result==="勝ち").length;
-    const avgScore = total ? (matches.reduce((s,m)=>s+Number(m.score),0)/total).toFixed(1) : 0;
+        // 集計
+        const total = matches.length;
+        const wins = matches.filter(m=>m.result==="勝ち").length;
+        const avgScore = total ? (matches.reduce((s,m)=>s+Number(m.score),0)/total).toFixed(1) : 0;
 
-    totalMatchesCard.querySelector("p").textContent = total;
-    avgScoreCard.querySelector("p").textContent = avgScore;
+        totalMatchesCard.querySelector("p").textContent = total;
+        avgScoreCard.querySelector("p").textContent = avgScore;
 
-    const winRatePercent = total ? ((wins/total)*100).toFixed(1) : 0;
-    winRateText.textContent = `${winRatePercent}%`;
+        const winRatePercent = total ? ((wins/total)*100).toFixed(1) : 0;
+        winRateText.textContent = `${winRatePercent}%`;
 
-    // 円グラフ描画（プラグインなし）
-    new Chart(winRateChartCanvas, {
-        type:'doughnut',
-        data:{
-            labels:['勝ち','負け'],
-            datasets:[{
-                data:[wins, total - wins],
-                backgroundColor:['#10b981','#ef4444']
-            }]
-        },
-        options:{
-            plugins:{legend:{display:false}},
-            cutout:'70%'
-        }
-    });
+        // 勝率グラフ
+        if(winRateChartInstance) winRateChartInstance.destroy();
+        winRateChartInstance = new Chart(winRateChartCanvas, {
+            type:'doughnut',
+            data:{
+                labels:['勝ち','負け'],
+                datasets:[{
+                    data:[wins, total - wins],
+                    backgroundColor:['#10b981','#ef4444']
+                }]
+            },
+            options:{
+                plugins:{legend:{display:false}},
+                cutout:'70%'
+            }
+        });
 
-    // 試合履歴
-    matchList.innerHTML = "";
-    const dailyMap = {};
-    matches.forEach(m=>{
-        if(!dailyMap[m.date]) dailyMap[m.date] = [];
-        dailyMap[m.date].push(Number(m.score));
+        // 試合履歴
+        matchList.innerHTML = "";
+        const dailyMap = {};
+        matches.forEach(m=>{
+            if(!dailyMap[m.date]) dailyMap[m.date] = [];
+            dailyMap[m.date].push(Number(m.score));
 
-        const tr = document.createElement("tr");
-        const cls = m.result==='勝ち'?'win':'lose';
-        tr.innerHTML = `<td>${m.date||'日付不明'}</td><td>${m.opponent}</td><td>${m.score}</td><td class="${cls}">${m.result}</td>`;
-        matchList.appendChild(tr);
-    });
+            const tr = document.createElement("tr");
+            const cls = m.result==='勝ち'?'win':'lose';
+            tr.innerHTML = `<td>${m.date||'日付不明'}</td><td>${m.opponent}</td><td>${m.score}</td><td class="${cls}">${m.result}</td>`;
+            matchList.appendChild(tr);
+        });
 
-    // 日付ごとの平均枚差グラフ
-    const dailyLabels = Object.keys(dailyMap).sort();
-    const dailyAvg = dailyLabels.map(d=> (dailyMap[d].reduce((s,v)=>s+v,0)/dailyMap[d].length).toFixed(1));
+        // 日付ごとの平均枚差グラフ
+        const dailyLabels = Object.keys(dailyMap).sort();
+        const dailyAvg = dailyLabels.map(d=> (dailyMap[d].reduce((s,v)=>s+v,0)/dailyMap[d].length).toFixed(1));
 
-    new Chart(dailyAvgChartCanvas, {
-        type:'line',
-        data:{
-            labels:dailyLabels,
-            datasets:[{
-                label:'平均枚差',
-                data:dailyAvg,
-                borderColor:'#3b82f6',
-                backgroundColor:'rgba(59,130,246,0.2)',
-                tension:0.3,
-                fill:true,
-            }]
-        },
-        options:{
-            responsive:true,
-            plugins:{legend:{display:false}},
-            scales:{y:{beginAtZero:true}},
-            maintainAspectRatio:false
-        }
-    });
+        if(dailyAvgChartInstance) dailyAvgChartInstance.destroy();
+        dailyAvgChartInstance = new Chart(dailyAvgChartCanvas, {
+            type:'line',
+            data:{
+                labels:dailyLabels,
+                datasets:[{
+                    label:'平均枚差',
+                    data:dailyAvg,
+                    borderColor:'#3b82f6',
+                    backgroundColor:'rgba(59,130,246,0.2)',
+                    tension:0.3,
+                    fill:true,
+                }]
+            },
+            options:{
+                responsive:true,
+                plugins:{legend:{display:false}},
+                scales:{y:{beginAtZero:true}},
+                maintainAspectRatio:false
+            }
+        });
 
-    // 対戦相手別集計
-    const opponentMap = {};
-    matches.forEach(m=>{
-        if(!opponentMap[m.opponent]) opponentMap[m.opponent]=[];
-        opponentMap[m.opponent].push(m);
-    });
-    createOpponentCharts(opponentMap);
+        // 対戦相手別集計
+        const opponentMap = {};
+        matches.forEach(m=>{
+            if(!opponentMap[m.opponent]) opponentMap[m.opponent]=[];
+            opponentMap[m.opponent].push(m);
+        });
+        createOpponentCharts(opponentMap);
+
+    } catch(error) {
+        console.error("matches の読み込みに失敗しました:", error);
+        alert("試合データの読み込みに失敗しました。");
+    }
 }
 
 function createOpponentCharts(opponentMap){
     const opponentLabels = Object.keys(opponentMap);
+
     const opponentWinRates = opponentLabels.map(o=>{
         const games = opponentMap[o];
         const winCount = games.filter(g=>g.result==='勝ち').length;
         return ((winCount/games.length)*100).toFixed(1);
     });
 
-    new Chart(opponentChartCanvas, {
+    if(opponentChartInstance) opponentChartInstance.destroy();
+    opponentChartInstance = new Chart(opponentChartCanvas, {
         type:'bar',
         data:{labels:opponentLabels,datasets:[{label:'勝率 (%)',data:opponentWinRates,backgroundColor:'#10b981'}]},
         options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}
@@ -162,7 +185,8 @@ function createOpponentCharts(opponentMap){
         return loses.length ? (loses.reduce((s,g)=>s+Number(g.score),0)/loses.length).toFixed(1) : 0;
     });
 
-    new Chart(scoreChartCanvas, {
+    if(scoreChartInstance) scoreChartInstance.destroy();
+    scoreChartInstance = new Chart(scoreChartCanvas, {
         type:'bar',
         data:{labels:opponentLabels,datasets:[
             {label:'勝ち平均枚差',data:avgWinScores,backgroundColor:'#3b82f6'},
